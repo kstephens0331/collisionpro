@@ -79,10 +79,15 @@ export async function POST(request: Request) {
       userId: result.user.id
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Failed to create account" },
+      {
+        error: "Failed to create account",
+        details: error.message,
+        code: error.code,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

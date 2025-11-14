@@ -31,5 +31,9 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/api/:path*"]
+  matcher: [
+    "/dashboard/:path*",
+    // Only protect specific API routes, exclude auth and health
+    "/api/((?!auth|health).*)"
+  ]
 };

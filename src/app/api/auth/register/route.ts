@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import { supabaseAdmin } from "@/lib/supabase";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -15,22 +15,37 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if email already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    // Check if email already exists in Supabase Auth
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const userExists = existingUsers?.users?.some(u => u.email === email);
 
-    if (existingUser) {
+    if (userExists) {
       return NextResponse.json(
         { error: "Email already registered" },
         { status: 400 }
       );
     }
 
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
+    // Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // Auto-confirm email
+      user_metadata: {
+        firstName,
+        lastName
+      }
+    });
 
-    // Create shop and user in a transaction
+    if (authError || !authData.user) {
+      console.error("Supabase auth error:", authError);
+      return NextResponse.json(
+        { error: "Failed to create auth user", details: authError?.message },
+        { status: 500 }
+      );
+    }
+
+    // Create shop and user records in database
     const result = await prisma.$transaction(async (tx) => {
       // Create shop
       const shop = await tx.shop.create({
@@ -43,12 +58,13 @@ export async function POST(request: Request) {
         }
       });
 
-      // Create admin user
+      // Create user record (linked to Supabase auth user)
       const user = await tx.user.create({
         data: {
+          id: authData.user.id, // Use Supabase auth user ID
           shopId: shop.id,
           email: email,
-          passwordHash: passwordHash,
+          passwordHash: "", // Not needed, Supabase handles auth
           firstName: firstName,
           lastName: lastName,
           role: "admin",

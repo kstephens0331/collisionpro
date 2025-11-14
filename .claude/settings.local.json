@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest collisionpro --typescript --tailwind --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(npx create-next-app:*)",
+      "Bash(dir)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init -p)",
+      "Bash(npx prisma:*)",
+      "Bash(nul)",
+      "Bash(.gitignore)",
+      "Bash(findstr:*)",
+      "Bash(npm run build:*)",
+      "Bash(move srcmiddleware.ts srcproxy.ts)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

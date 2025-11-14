@@ -1,6 +1,6 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { cookies } from "next/headers";
+import { supabase } from "@/lib/supabase";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 
 export default async function DashboardLayout({
@@ -8,15 +8,17 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  // Check for Supabase session cookie
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("sb-access-token");
 
-  if (!session) {
+  if (!accessToken) {
     redirect("/auth/login");
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardNav session={session} />
+      <DashboardNav />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>

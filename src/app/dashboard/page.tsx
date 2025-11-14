@@ -1,20 +1,16 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Users, DollarSign, Clock } from "lucide-react";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
-
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back, {session?.user.name}!
+          Welcome back!
         </h1>
         <p className="text-gray-600 mt-1">
-          {session?.user.shop.name} • {session?.user.role}
+          CollisionPro Dashboard
         </p>
       </div>
 

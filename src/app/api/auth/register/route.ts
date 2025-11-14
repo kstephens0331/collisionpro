@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = 'https://pkyqrvrxwhlwkxalsbaz.supabase.co';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   try {
@@ -17,11 +14,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create admin client
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
     // Create user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
@@ -42,7 +36,7 @@ export async function POST(request: Request) {
     }
 
     // Create shop record in database
-    const { data: shopData, error: shopError } = await supabase
+    const { data: shopData, error: shopError } = await supabaseAdmin
       .from('Shop')
       .insert({
         id: authData.user.id + '_shop',
@@ -58,7 +52,7 @@ export async function POST(request: Request) {
     if (shopError) {
       console.error("Shop creation error:", shopError);
       // Delete the auth user if shop creation fails
-      await supabase.auth.admin.deleteUser(authData.user.id);
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       return NextResponse.json(
         { error: "Failed to create shop", details: shopError.message },
         { status: 500 }
@@ -66,7 +60,7 @@ export async function POST(request: Request) {
     }
 
     // Create user record in database
-    const { error: userError } = await supabase
+    const { error: userError } = await supabaseAdmin
       .from('User')
       .insert({
         id: authData.user.id,
@@ -88,7 +82,7 @@ export async function POST(request: Request) {
     }
 
     // Create default rate profile
-    const { error: rateError } = await supabase
+    const { error: rateError } = await supabaseAdmin
       .from('RateProfile')
       .insert({
         shopId: shopData.id,

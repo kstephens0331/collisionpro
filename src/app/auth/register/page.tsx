@@ -47,11 +47,16 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Registration failed");
+        // Show detailed error for debugging
+        const errorMsg = data.details
+          ? `${data.error}: ${data.details}`
+          : data.error || "Registration failed";
+        throw new Error(errorMsg);
       }
 
       router.push("/auth/login?registered=true");
     } catch (err: any) {
+      console.error("Registration error:", err);
       setError(err.message);
     } finally {
       setLoading(false);

@@ -40,6 +40,12 @@ export default function DashboardNav() {
                 Dashboard
               </Link>
               <Link
+                href="/dashboard/parts"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
+              >
+                Parts Catalog
+              </Link>
+              <Link
                 href="/dashboard/estimates"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
               >

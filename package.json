@@ -5,9 +5,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "db:setup": "node scripts/setup-db.js",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
   },
   "private": true,
   "keywords": [],

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = 'https://pkyqrvrxwhlwkxalsbaz.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function POST(request: Request) {
   try {
@@ -15,25 +17,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if email already exists in Supabase Auth
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const userExists = existingUsers?.users?.some(u => u.email === email);
-
-    if (userExists) {
-      return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 400 }
-      );
-    }
+    // Create admin client
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Create user in Supabase Auth
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Auto-confirm email
+      email_confirm: true,
       user_metadata: {
         firstName,
-        lastName
+        lastName,
+        shopName,
+        phone
       }
     });
 
@@ -45,54 +41,73 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create shop and user records in database
-    const result = await prisma.$transaction(async (tx) => {
-      // Create shop
-      const shop = await tx.shop.create({
-        data: {
-          name: shopName,
-          email: email,
-          phone: phone,
-          subscriptionTier: "trial",
-          subscriptionStatus: "active"
-        }
+    // Create shop record in database
+    const { data: shopData, error: shopError } = await supabase
+      .from('Shop')
+      .insert({
+        id: authData.user.id + '_shop',
+        name: shopName,
+        email: email,
+        phone: phone,
+        subscriptionTier: 'trial',
+        subscriptionStatus: 'active'
+      })
+      .select()
+      .single();
+
+    if (shopError) {
+      console.error("Shop creation error:", shopError);
+      // Delete the auth user if shop creation fails
+      await supabase.auth.admin.deleteUser(authData.user.id);
+      return NextResponse.json(
+        { error: "Failed to create shop", details: shopError.message },
+        { status: 500 }
+      );
+    }
+
+    // Create user record in database
+    const { error: userError } = await supabase
+      .from('User')
+      .insert({
+        id: authData.user.id,
+        shopId: shopData.id,
+        email: email,
+        passwordHash: '',
+        firstName: firstName,
+        lastName: lastName,
+        role: 'admin',
+        isActive: true
       });
 
-      // Create user record (linked to Supabase auth user)
-      const user = await tx.user.create({
-        data: {
-          id: authData.user.id, // Use Supabase auth user ID
-          shopId: shop.id,
-          email: email,
-          passwordHash: "", // Not needed, Supabase handles auth
-          firstName: firstName,
-          lastName: lastName,
-          role: "admin",
-          isActive: true
-        }
+    if (userError) {
+      console.error("User record creation error:", userError);
+      return NextResponse.json(
+        { error: "Failed to create user record", details: userError.message },
+        { status: 500 }
+      );
+    }
+
+    // Create default rate profile
+    const { error: rateError } = await supabase
+      .from('RateProfile')
+      .insert({
+        shopId: shopData.id,
+        name: 'Standard',
+        laborRate: 50.00,
+        paintRate: 45.00,
+        markupPercentage: 30.00,
+        taxRate: 8.25,
+        isDefault: true
       });
 
-      // Create default rate profile
-      await tx.rateProfile.create({
-        data: {
-          shopId: shop.id,
-          name: "Standard",
-          laborRate: 50.00,
-          paintRate: 45.00,
-          markupPercentage: 30.00,
-          taxRate: 8.25,
-          isDefault: true
-        }
-      });
-
-      return { shop, user };
-    });
+    if (rateError) {
+      console.error("Rate profile creation error:", rateError);
+    }
 
     return NextResponse.json({
       success: true,
       message: "Account created successfully",
-      shopId: result.shop.id,
-      userId: result.user.id
+      userId: authData.user.id
     });
 
   } catch (error: any) {
@@ -100,9 +115,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: "Failed to create account",
-        details: error.message,
-        code: error.code,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        details: error.message
       },
       { status: 500 }
     );

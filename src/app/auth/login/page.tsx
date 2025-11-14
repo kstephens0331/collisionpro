@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,14 +21,19 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Call login API endpoint instead of client-side Supabase
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (signInError) {
-        setError("Invalid email or password");
-      } else if (data.session) {
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.error || "Invalid email or password");
+      } else {
+        // Login successful, redirect to dashboard
         router.push("/dashboard");
         router.refresh();
       }

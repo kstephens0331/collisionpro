@@ -1,32 +1,32 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET() {
   try {
-    // Test database connection
-    await prisma.$connect();
+    // Test database connection by querying shops table
+    const { data: shops, error } = await supabaseAdmin
+      .from('Shop')
+      .select('id', { count: 'exact', head: true });
 
-    // Try to query a table
-    const shopCount = await prisma.shop.count();
+    if (error) {
+      return NextResponse.json({
+        status: "error",
+        error: error.message,
+        timestamp: new Date().toISOString()
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       status: "healthy",
       database: "connected",
-      prisma: "working",
-      tables: {
-        shops: shopCount
-      },
+      supabase: "working",
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
     return NextResponse.json({
       status: "error",
       error: error.message,
-      stack: error.stack,
-      prismaGenerated: typeof prisma !== 'undefined',
       timestamp: new Date().toISOString()
     }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

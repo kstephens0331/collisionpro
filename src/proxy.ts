@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 export default async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
@@ -18,11 +17,6 @@ export default async function proxy(req: NextRequest) {
 
   // For dashboard routes, check Supabase session
   if (path.startsWith("/dashboard")) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
     // Get session from cookies
     const sessionCookie = req.cookies.get("sb-access-token")?.value;
 

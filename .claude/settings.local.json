@@ -21,7 +21,11 @@
       "Bash(npx supabase --version)",
       "Bash(node scripts/reset-db.js:*)",
       "Bash(gh api:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(npx vercel:*)",
+      "Bash(echo:*)",
+      "Bash(curl:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

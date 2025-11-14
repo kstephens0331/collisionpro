@@ -17,7 +17,9 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: CollisionPro Phase 1 - Authentication & Foundation\n\n✅ Complete authentication system with NextAuth.js\n✅ Multi-tenant shop management\n✅ Role-based access control\n✅ Professional UI with Tailwind CSS v4\n✅ Prisma ORM with PostgreSQL (Supabase)\n✅ Production build passing with 0 errors\n\nBuilt to compete with Mitchell International, CCC ONE, and Audatex.\n\n🤖 Generated with Claude Code\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(gh repo create:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npx supabase --version)",
+      "Bash(node scripts/reset-db.js:*)"
     ],
     "deny": [],
     "ask": []

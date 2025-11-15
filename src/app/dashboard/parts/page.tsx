@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Search, Package, TrendingDown, TrendingUp, ShoppingCart } from "lucide-react";
+import { Search, Package, TrendingDown, ShoppingCart, Plus } from "lucide-react";
 
 interface PartPrice {
   id: string;
@@ -13,7 +14,9 @@ interface PartPrice {
   inStock: boolean;
   leadTimeDays: number;
   warranty: string;
+  productUrl: string;
   supplier: {
+    id: string;
     name: string;
     code: string;
   };
@@ -48,6 +51,14 @@ export default function PartsPage() {
   const [loading, setLoading] = useState(false);
   const [selectedPart, setSelectedPart] = useState<Part | null>(null);
 
+  // Purchase order state
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState<PartPrice | null>(null);
+  const [customerName, setCustomerName] = useState("");
+  const [vehicleVin, setVehicleVin] = useState("");
+  const [jobNotes, setJobNotes] = useState("");
+  const [creating, setCreating] = useState(false);
+
   const searchParts = async () => {
     if (!searchQuery && !make) {
       return;
@@ -79,6 +90,105 @@ export default function PartsPage() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       searchParts();
+    }
+  };
+
+  const handleBuyNow = (part: Part, price: PartPrice) => {
+    setSelectedPrice(price);
+    // Pre-fill vehicle info from search
+    setMake(part.make);
+    setModel(part.model);
+    setYear(part.yearStart?.toString() || "");
+    setShowPurchaseForm(true);
+  };
+
+  const addToCart = (part: Part) => {
+    const cartItem = {
+      partId: part.id,
+      partNumber: part.partNumber,
+      partName: part.name,
+      quantity: 1,
+      weight: 10, // Default weight, can be updated later
+      availablePrices: part.prices.map((p) => ({
+        supplierId: p.supplier.id,
+        supplierName: p.supplier.name,
+        supplierCode: p.supplier.code,
+        partPriceId: p.id,
+        unitPrice: p.price,
+        inStock: p.inStock,
+        leadTimeDays: p.leadTimeDays,
+        productUrl: p.productUrl,
+      })),
+    };
+
+    // Load existing cart
+    const savedCart = localStorage.getItem("collisionpro_cart");
+    const cart = savedCart ? JSON.parse(savedCart) : [];
+
+    // Check if part already in cart
+    const existingIndex = cart.findIndex((item: any) => item.partId === part.id);
+    if (existingIndex >= 0) {
+      // Increment quantity
+      cart[existingIndex].quantity += 1;
+    } else {
+      // Add new item
+      cart.push(cartItem);
+    }
+
+    // Save cart
+    localStorage.setItem("collisionpro_cart", JSON.stringify(cart));
+
+    alert(`Added ${part.name} to cart!`);
+  };
+
+  const createPurchaseOrder = async () => {
+    if (!selectedPart || !selectedPrice) return;
+
+    setCreating(true);
+    try {
+      const response = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          supplierId: selectedPrice.supplier.id,
+          parts: [
+            {
+              partId: selectedPart.id,
+              partPriceId: selectedPrice.id,
+              quantity: 1,
+              productUrl: selectedPrice.productUrl,
+            },
+          ],
+          customerName,
+          vehicleMake: selectedPart.make,
+          vehicleModel: selectedPart.model,
+          vehicleYear: selectedPart.yearStart,
+          vehicleVin,
+          notes: jobNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`Order ${data.order.orderNumber} created! Check Orders page to track.`);
+        setShowPurchaseForm(false);
+        setCustomerName("");
+        setVehicleVin("");
+        setJobNotes("");
+
+        // Open supplier link in new tab
+        if (selectedPrice.productUrl) {
+          window.open(selectedPrice.productUrl, '_blank');
+        }
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Order creation error:", error);
+      alert("Failed to create order");
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -280,10 +390,31 @@ export default function PartsPage() {
                               </div>
                             )}
                           </div>
-                          <Button className="ml-4">
-                            <ShoppingCart className="h-4 w-4 mr-2" />
-                            Add to Estimate
-                          </Button>
+                          <div className="ml-4 flex gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => window.open(price.productUrl, '_blank')}
+                              disabled={!price.productUrl}
+                            >
+                              View on {price.supplier.name}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToCart(selectedPart);
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add to Cart
+                            </Button>
+                            <Button
+                              onClick={() => handleBuyNow(selectedPart, price)}
+                            >
+                              <ShoppingCart className="h-4 w-4 mr-2" />
+                              Buy Now
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -313,6 +444,119 @@ export default function PartsPage() {
                     </div>
                   </CardContent>
                 </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Purchase Order Form Modal */}
+      {showPurchaseForm && selectedPart && selectedPrice && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          onClick={() => setShowPurchaseForm(false)}
+        >
+          <Card
+            className="max-w-2xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader>
+              <CardTitle>Create Purchase Order</CardTitle>
+              <p className="text-sm text-gray-600">
+                Buying: {selectedPart.name} from {selectedPrice.supplier.name}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Vehicle Info */}
+                <div>
+                  <h3 className="font-semibold mb-2">Vehicle Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Year</Label>
+                      <Input value={year} onChange={(e) => setYear(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>Make</Label>
+                      <Input value={make} onChange={(e) => setMake(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>Model</Label>
+                      <Input value={model} onChange={(e) => setModel(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>VIN</Label>
+                      <Input
+                        value={vehicleVin}
+                        onChange={(e) => setVehicleVin(e.target.value)}
+                        placeholder="Optional"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Info */}
+                <div>
+                  <Label>Customer Name</Label>
+                  <Input
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Optional"
+                  />
+                </div>
+
+                {/* Job Notes */}
+                <div>
+                  <Label>Job Notes</Label>
+                  <Input
+                    value={jobNotes}
+                    onChange={(e) => setJobNotes(e.target.value)}
+                    placeholder="Optional"
+                  />
+                </div>
+
+                {/* Order Summary */}
+                <Card className="bg-gray-50">
+                  <CardContent className="pt-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="font-semibold">Part:</span>
+                        <span>{selectedPart.partNumber}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-semibold">Supplier:</span>
+                        <span>{selectedPrice.supplier.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-semibold">Price:</span>
+                        <span className="text-lg font-bold">
+                          ${selectedPrice.price.toFixed(2)}
+                        </span>
+                      </div>
+                      {selectedPrice.productUrl && (
+                        <div className="text-sm text-gray-600 mt-2">
+                          ℹ️ After creating order, you'll be directed to {selectedPrice.supplier.name} to complete purchase
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Actions */}
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPurchaseForm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={createPurchaseOrder}
+                    disabled={creating}
+                  >
+                    {creating ? "Creating..." : "Create Order & Buy"}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

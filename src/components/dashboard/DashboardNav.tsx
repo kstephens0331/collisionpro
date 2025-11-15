@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Settings } from "lucide-react";
+import { User, LogOut, Settings, ShoppingCart } from "lucide-react";
 
 export default function DashboardNav() {
   const router = useRouter();
@@ -56,6 +56,13 @@ export default function DashboardNav() {
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
               >
                 Customers
+              </Link>
+              <Link
+                href="/dashboard/cart"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
+              >
+                <ShoppingCart className="h-4 w-4 mr-1" />
+                Cart
               </Link>
             </div>
           </div>

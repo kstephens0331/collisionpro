@@ -13,6 +13,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<ShopSettings | null>(null);
+  const [originalSettings, setOriginalSettings] = useState<ShopSettings | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // For demo, use hardcoded shopId - in production, get from session
   const shopId = "shop_demo";
@@ -21,6 +23,27 @@ export default function SettingsPage() {
     fetchSettings();
   }, []);
 
+  // Detect unsaved changes
+  useEffect(() => {
+    if (settings && originalSettings) {
+      const changed = JSON.stringify(settings) !== JSON.stringify(originalSettings);
+      setHasUnsavedChanges(changed);
+    }
+  }, [settings, originalSettings]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   const fetchSettings = async () => {
     try {
       const response = await fetch(`/api/shop-settings?shopId=${shopId}`);
@@ -28,13 +51,16 @@ export default function SettingsPage() {
 
       if (data.success && data.settings) {
         setSettings(data.settings);
+        setOriginalSettings(data.settings);
       } else {
         // Initialize with defaults
-        setSettings({
+        const defaultSettings = {
           id: `settings_${Date.now()}`,
           shopId,
           ...DEFAULT_SHOP_SETTINGS,
-        });
+        };
+        setSettings(defaultSettings);
+        setOriginalSettings(defaultSettings);
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -60,6 +86,8 @@ export default function SettingsPage() {
       if (data.success) {
         alert("Settings saved successfully!");
         setSettings(data.settings);
+        setOriginalSettings(data.settings); // Reset original after save
+        setHasUnsavedChanges(false);
       } else {
         alert(data.error || "Failed to save settings");
       }
@@ -94,6 +122,14 @@ export default function SettingsPage() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
+      {hasUnsavedChanges && (
+        <div className="mb-4 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            <strong>Unsaved changes</strong> - Don't forget to save your settings before leaving this page.
+          </p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Shop Settings</h1>
@@ -101,7 +137,7 @@ export default function SettingsPage() {
             Configure your labor rates, fees, and business information
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving || !hasUnsavedChanges}>
           {saving ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -110,7 +146,7 @@ export default function SettingsPage() {
           ) : (
             <>
               <Save className="h-4 w-4 mr-2" />
-              Save Settings
+              {hasUnsavedChanges ? "Save Changes" : "All Saved"}
             </>
           )}
         </Button>

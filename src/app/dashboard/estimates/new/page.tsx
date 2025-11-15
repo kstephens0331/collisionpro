@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,7 @@ export default function NewEstimatePage() {
   const [loading, setLoading] = useState(false);
   const [decodingVIN, setDecodingVIN] = useState(false);
   const [usePartialVIN, setUsePartialVIN] = useState(false);
+  const [loadingSettings, setLoadingSettings] = useState(true);
   const [formData, setFormData] = useState<EstimateFormData>({
     customerName: "",
     customerEmail: "",
@@ -81,8 +82,8 @@ export default function NewEstimatePage() {
     dateOfLoss: "",
     notes: "",
     internalNotes: "",
-    laborRate: "75.00",
-    taxRate: "0.0825",
+    laborRate: "75.00", // Will be updated from shop settings
+    taxRate: "0.0825", // Will be updated from shop settings
   });
 
   const steps: { id: FormStep; title: string; icon: any }[] = [
@@ -93,6 +94,34 @@ export default function NewEstimatePage() {
   ];
 
   const currentStepIndex = steps.findIndex((s) => s.id === currentStep);
+
+  // Load shop settings on mount
+  useEffect(() => {
+    const loadShopSettings = async () => {
+      try {
+        // For demo, use hardcoded shopId - in production, get from session
+        const shopId = "shop_demo";
+        const response = await fetch(`/api/shop-settings?shopId=${shopId}`);
+        const data = await response.json();
+
+        if (data.success && data.settings) {
+          // Update form with shop's default tax rate
+          setFormData((prev) => ({
+            ...prev,
+            taxRate: (data.settings.defaultTaxRate || 0.0825).toString(),
+            // Note: laborRate will vary by operation type, so we keep default for now
+          }));
+        }
+      } catch (error) {
+        console.error("Error loading shop settings:", error);
+        // Continue with default values
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+
+    loadShopSettings();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

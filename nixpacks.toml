@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ['nodejs-20_x']
+
+[phases.install]
+cmds = ['npm install']
+
+[phases.build]
+cmds = ['echo "Skipping Next.js build for scraper service"']
+
+[start]
+cmd = 'npm run scrape:schedule'

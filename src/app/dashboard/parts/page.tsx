@@ -59,12 +59,16 @@ export default function PartsPage() {
   const [jobNotes, setJobNotes] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const searchParts = async () => {
+  // Real-time polling state
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+
+  const searchParts = async (silent = false) => {
     if (!searchQuery && !make) {
       return;
     }
 
-    setLoading(true);
+    if (!silent) setLoading(true);
     try {
       const params = new URLSearchParams();
       if (searchQuery) params.append("q", searchQuery);
@@ -77,15 +81,27 @@ export default function PartsPage() {
 
       if (data.success) {
         setParts(data.parts);
+        setLastUpdate(new Date());
       } else {
         console.error("Search failed:", data.error);
       }
     } catch (error) {
       console.error("Search error:", error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
+
+  // Auto-refresh every 10 seconds when search is active
+  useEffect(() => {
+    if (!autoRefresh || parts.length === 0) return;
+
+    const interval = setInterval(() => {
+      searchParts(true); // Silent refresh
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, parts.length, searchQuery, make, model, year]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -195,11 +211,36 @@ export default function PartsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Parts Catalog</h1>
-        <p className="text-gray-600 mt-1">
-          Search across 6 suppliers for the best prices
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Parts Catalog</h1>
+          <p className="text-gray-600 mt-1">
+            Search across 6 suppliers for the best prices
+          </p>
+        </div>
+
+        {/* Real-time update indicator */}
+        {parts.length > 0 && (
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-500">
+              Last updated: {lastUpdate.toLocaleTimeString()}
+            </div>
+            <Button
+              variant={autoRefresh ? "default" : "outline"}
+              size="sm"
+              onClick={() => setAutoRefresh(!autoRefresh)}
+            >
+              {autoRefresh ? (
+                <>
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
+                  Live Updates
+                </>
+              ) : (
+                "Enable Live Updates"
+              )}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Search Section */}

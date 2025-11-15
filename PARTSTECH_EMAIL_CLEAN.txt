@@ -63,14 +63,16 @@ Can we schedule a call this week or next?
 Thanks for your consideration!
 
 Best,
-[Your Name]
-Founder, CollisionPro
+
+Kyle Stephens
+CTO & Founder - Veteran Owned
+StephensCode LLC - CollisionPro
+9363234527
+Kyle@stephenscode.dev
+https://stephenscode.dev
 
 P.S. - We've already built the cart optimizer and have a production database ready to sync with PartsTech's API. We can be integrated and driving transactions within 2 weeks of getting credentials.
 
-Contact:
-Email: [your email]
-Phone: [your phone]
 Platform: https://collisionpro.vercel.app
 GitHub: https://github.com/kstephens0331/collisionpro
 

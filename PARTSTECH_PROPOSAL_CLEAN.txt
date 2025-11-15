@@ -2,7 +2,7 @@ PARTSTECH API INTEGRATION PROPOSAL - COLLISIONPRO
 
 Date: January 15, 2025
 To: PartsTech Sales & Business Development
-From: CollisionPro Development Team
+From: StephensCode LLC - CollisionPro Development Team
 Subject: Enterprise Integration Partnership Request
 
 EXECUTIVE SUMMARY
@@ -339,16 +339,20 @@ Proposed Call: 30-45 minutes to discuss partnership details
 Contact Information:
 - Platform: https://collisionpro.vercel.app
 - GitHub: https://github.com/kstephens0331/collisionpro
-- Email: [Your contact email]
-- Phone: [Your phone number]
+- Email: Kyle@stephenscode.dev
+- Phone: 9363234527
+- Website: https://stephenscode.dev
 
 Thank you for considering this partnership. We're excited about the potential to bring PartsTech's powerful supplier network to the collision repair industry through CollisionPro.
 
 Best regards,
 
-[Your Name]
-Founder & Lead Developer
-CollisionPro
+Kyle Stephens
+CTO & Founder - Veteran Owned
+StephensCode LLC - CollisionPro
+9363234527
+Kyle@stephenscode.dev
+https://stephenscode.dev
 
 APPENDIX: TECHNICAL PROOF OF CONCEPT
 

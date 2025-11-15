@@ -11,20 +11,22 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string; itemId: string } }
+  { params }: { params: Promise<{ id: string; itemId: string }> }
 ) {
   try {
+    const { id, itemId } = await params;
+
     // Get item details before deleting for history log
     const { data: item } = await supabaseAdmin
       .from('EstimateLineItem')
       .select('*')
-      .eq('id', params.itemId)
+      .eq('id', itemId)
       .single();
 
     const { error } = await supabaseAdmin
       .from('EstimateLineItem')
       .delete()
-      .eq('id', params.itemId);
+      .eq('id', itemId);
 
     if (error) {
       console.error('Supabase error:', error);
@@ -35,18 +37,18 @@ export async function DELETE(
     }
 
     // Recalculate estimate totals
-    await recalculateEstimateTotals(params.id);
+    await recalculateEstimateTotals(id);
 
     // Log to history
     if (item) {
       await supabaseAdmin.from('EstimateHistory').insert({
         id: `history_${Date.now()}`,
-        estimateId: params.id,
+        estimateId: id,
         action: 'item_removed',
         description: `Removed ${item.type}: ${item.partName}`,
         userId: 'user_demo', // TODO: Get from session
         userName: 'User',
-        metadata: { itemId: params.itemId },
+        metadata: { itemId },
       });
     }
 
@@ -68,9 +70,10 @@ export async function DELETE(
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string; itemId: string } }
+  { params }: { params: Promise<{ id: string; itemId: string }> }
 ) {
   try {
+    const { id, itemId } = await params;
     const body = await request.json();
 
     // Recalculate line total if quantity or price changed
@@ -78,7 +81,7 @@ export async function PATCH(
       const { data: currentItem } = await supabaseAdmin
         .from('EstimateLineItem')
         .select('quantity, unitPrice')
-        .eq('id', params.itemId)
+        .eq('id', itemId)
         .single();
 
       const quantity = body.quantity !== undefined ? body.quantity : currentItem?.quantity || 1;
@@ -89,7 +92,7 @@ export async function PATCH(
     const { data: lineItem, error } = await supabaseAdmin
       .from('EstimateLineItem')
       .update(body)
-      .eq('id', params.itemId)
+      .eq('id', itemId)
       .select()
       .single();
 
@@ -102,17 +105,17 @@ export async function PATCH(
     }
 
     // Recalculate estimate totals
-    await recalculateEstimateTotals(params.id);
+    await recalculateEstimateTotals(id);
 
     // Log to history
     await supabaseAdmin.from('EstimateHistory').insert({
       id: `history_${Date.now()}`,
-      estimateId: params.id,
+      estimateId: id,
       action: 'item_updated',
       description: `Updated ${lineItem.type}: ${lineItem.partName}`,
       userId: 'user_demo', // TODO: Get from session
       userName: 'User',
-      metadata: { itemId: params.itemId, fields: Object.keys(body) },
+      metadata: { itemId, fields: Object.keys(body) },
     });
 
     return NextResponse.json({

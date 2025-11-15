@@ -11,13 +11,14 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: items, error } = await supabaseAdmin
       .from('EstimateLineItem')
       .select('*')
-      .eq('estimateId', params.id)
+      .eq('estimateId', id)
       .order('sequence', { ascending: true });
 
     if (error) {
@@ -47,9 +48,10 @@ export async function GET(
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     // Calculate line total
@@ -61,7 +63,7 @@ export async function POST(
     const { data: existingItems } = await supabaseAdmin
       .from('EstimateLineItem')
       .select('sequence')
-      .eq('estimateId', params.id)
+      .eq('estimateId', id)
       .order('sequence', { ascending: false })
       .limit(1);
 
@@ -71,7 +73,7 @@ export async function POST(
 
     const lineItemData = {
       id: `item_${Date.now()}`,
-      estimateId: params.id,
+      estimateId: id,
       type: body.type,
       sequence: nextSequence,
       partId: body.partId || null,
@@ -103,12 +105,12 @@ export async function POST(
     }
 
     // Recalculate estimate totals
-    await recalculateEstimateTotals(params.id);
+    await recalculateEstimateTotals(id);
 
     // Log to history
     await supabaseAdmin.from('EstimateHistory').insert({
       id: `history_${Date.now()}`,
-      estimateId: params.id,
+      estimateId: id,
       action: 'item_added',
       description: `Added ${body.type}: ${body.partName}`,
       userId: 'user_demo', // TODO: Get from session

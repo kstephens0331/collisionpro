@@ -11,13 +11,14 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { data: estimate, error } = await supabaseAdmin
       .from('Estimate')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -54,15 +55,16 @@ export async function GET(
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     const { data: estimate, error } = await supabaseAdmin
       .from('Estimate')
       .update(body)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -77,7 +79,7 @@ export async function PATCH(
     // Log update to history
     await supabaseAdmin.from('EstimateHistory').insert({
       id: `history_${Date.now()}`,
-      estimateId: params.id,
+      estimateId: id,
       action: 'updated',
       description: 'Estimate updated',
       userId: 'user_demo', // TODO: Get from session
@@ -104,13 +106,14 @@ export async function PATCH(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { error } = await supabaseAdmin
       .from('Estimate')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       console.error('Supabase error:', error);

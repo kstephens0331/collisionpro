@@ -25,7 +25,9 @@
       "Bash(npx vercel:*)",
       "Bash(echo:*)",
       "Bash(curl:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(test:*)",
+      "Bash(npm run scrape:*)"
     ],
     "deny": [],
     "ask": []

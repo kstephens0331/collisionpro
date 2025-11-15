@@ -281,7 +281,7 @@ export default function PartsPage() {
               type="number"
             />
           </div>
-          <Button onClick={searchParts} disabled={loading} className="mt-4">
+          <Button onClick={() => searchParts()} disabled={loading} className="mt-4">
             <Search className="h-4 w-4 mr-2" />
             {loading ? "Searching..." : "Search Parts"}
           </Button>

@@ -30,7 +30,7 @@ export class AutoZoneScraper extends BaseScraper {
 
     try {
       const browser = await puppeteer.launch({
-        headless: 'new', // New headless mode (harder to detect)
+        headless: true, // Headless mode
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',

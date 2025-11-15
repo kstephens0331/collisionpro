@@ -59,6 +59,7 @@ export default function NewEstimatePage() {
   const [currentStep, setCurrentStep] = useState<FormStep>("customer");
   const [loading, setLoading] = useState(false);
   const [decodingVIN, setDecodingVIN] = useState(false);
+  const [usePartialVIN, setUsePartialVIN] = useState(false);
   const [formData, setFormData] = useState<EstimateFormData>({
     customerName: "",
     customerEmail: "",
@@ -103,8 +104,10 @@ export default function NewEstimatePage() {
   const handleDecodeVIN = async () => {
     const vin = formData.vehicleVin.trim();
 
-    if (!vin || vin.length !== 17) {
-      alert("Please enter a valid 17-character VIN");
+    // Validate based on mode
+    const expectedLength = usePartialVIN ? 6 : 17;
+    if (!vin || vin.length !== expectedLength) {
+      alert(`Please enter ${usePartialVIN ? 'the last 6 digits' : 'a valid 17-character VIN'}`);
       return;
     }
 
@@ -113,13 +116,15 @@ export default function NewEstimatePage() {
       const response = await fetch("/api/vin/decode", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vin }),
+        body: JSON.stringify({ vin, partialVin: usePartialVIN }),
       });
 
       const data = await response.json();
 
       if (data.success && data.data) {
         const vehicle = data.data;
+        const isPartial = data.isPartial;
+
         setFormData((prev) => ({
           ...prev,
           vehicleYear: vehicle.year?.toString() || prev.vehicleYear,
@@ -127,13 +132,18 @@ export default function NewEstimatePage() {
           vehicleModel: vehicle.model || prev.vehicleModel,
           vehicleTrim: vehicle.trim || prev.vehicleTrim,
         }));
-        alert("VIN decoded successfully! Vehicle details have been filled in.");
+
+        if (isPartial) {
+          alert("Last 6 digits decoded! Make and Model filled in. Year may not be available - please enter manually if known.");
+        } else {
+          alert("VIN decoded successfully! Vehicle details have been filled in.");
+        }
       } else {
-        alert(data.error || "Failed to decode VIN. Please verify the VIN is correct.");
+        alert(data.error || `Failed to decode ${usePartialVIN ? 'last 6 digits' : 'VIN'}. Please verify the ${usePartialVIN ? 'digits are' : 'VIN is'} correct.`);
       }
     } catch (error) {
       console.error("Error decoding VIN:", error);
-      alert("Failed to decode VIN. Please try again.");
+      alert(`Failed to decode ${usePartialVIN ? 'last 6 digits' : 'VIN'}. Please try again.`);
     } finally {
       setDecodingVIN(false);
     }
@@ -404,30 +414,53 @@ export default function NewEstimatePage() {
                 />
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="vehicleVin">VIN</Label>
+                <Label htmlFor="vehicleVin">
+                  {usePartialVIN ? "Last 6 Digits of VIN" : "VIN"}
+                </Label>
                 <div className="flex gap-2">
                   <Input
                     id="vehicleVin"
                     name="vehicleVin"
                     value={formData.vehicleVin}
                     onChange={handleInputChange}
-                    placeholder="1HGBH41JXMN109186"
-                    maxLength={17}
+                    placeholder={usePartialVIN ? "123456" : "1HGBH41JXMN109186"}
+                    maxLength={usePartialVIN ? 6 : 17}
                     className="flex-1"
                   />
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleDecodeVIN}
-                    disabled={decodingVIN || formData.vehicleVin.length !== 17}
+                    disabled={
+                      decodingVIN ||
+                      formData.vehicleVin.length !== (usePartialVIN ? 6 : 17)
+                    }
                   >
                     <Sparkles className="h-4 w-4 mr-2" />
-                    {decodingVIN ? "Decoding..." : "Decode VIN"}
+                    {decodingVIN ? "Decoding..." : "Decode"}
                   </Button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Enter 17-character VIN and click Decode to auto-fill vehicle details
-                </p>
+                <div className="flex items-center gap-4 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={usePartialVIN}
+                      onChange={(e) => {
+                        setUsePartialVIN(e.target.checked);
+                        setFormData((prev) => ({ ...prev, vehicleVin: "" }));
+                      }}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-600">
+                      Use last 6 digits only
+                    </span>
+                  </label>
+                  <p className="text-xs text-gray-500">
+                    {usePartialVIN
+                      ? "Partial decode: Make/Model only (year may not be available)"
+                      : "Full decode: Year, Make, Model, and Trim"}
+                  </p>
+                </div>
               </div>
               <div>
                 <Label htmlFor="vehicleMileage">Mileage</Label>

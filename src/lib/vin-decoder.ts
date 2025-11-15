@@ -32,24 +32,42 @@ export interface VehicleDetails {
 
 /**
  * Decode VIN using NHTSA vPIC API
+ * Supports full 17-char VIN or last 6 digits
  */
-export async function decodeVIN(vin: string): Promise<{
+export async function decodeVIN(vin: string, partialVin: boolean = false): Promise<{
   success: boolean;
   data?: VehicleDetails;
   error?: string;
+  isPartial?: boolean;
 }> {
   try {
-    // Validate VIN format (17 characters, alphanumeric, no I, O, Q)
-    const vinRegex = /^[A-HJ-NPR-Z0-9]{17}$/i;
-    if (!vinRegex.test(vin)) {
-      return {
-        success: false,
-        error: 'Invalid VIN format. VIN must be 17 characters (no I, O, or Q).',
-      };
+    const cleanVin = vin.trim().toUpperCase();
+
+    // Validate VIN format
+    if (partialVin) {
+      // Last 6 digits validation
+      const partialRegex = /^[A-HJ-NPR-Z0-9]{6}$/i;
+      if (!partialRegex.test(cleanVin)) {
+        return {
+          success: false,
+          error: 'Invalid format. Last 6 digits must be alphanumeric (no I, O, or Q).',
+        };
+      }
+    } else {
+      // Full 17-char VIN validation
+      const vinRegex = /^[A-HJ-NPR-Z0-9]{17}$/i;
+      if (!vinRegex.test(cleanVin)) {
+        return {
+          success: false,
+          error: 'Invalid VIN format. VIN must be 17 characters (no I, O, or Q).',
+        };
+      }
     }
 
     // Call NHTSA vPIC API
-    const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`;
+    // For partial VIN, prepend with wildcards (11 positions + 6 digits)
+    const vinToLookup = partialVin ? `***********${cleanVin}` : cleanVin;
+    const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vinToLookup}?format=json`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -83,16 +101,27 @@ export async function decodeVIN(vin: string): Promise<{
     };
 
     // Check if we got valid data
-    if (!vehicleDetails.year || !vehicleDetails.make || !vehicleDetails.model) {
-      return {
-        success: false,
-        error: 'Could not decode VIN. Please verify the VIN is correct.',
-      };
+    // For partial VIN, year won't be available - that's expected
+    if (partialVin) {
+      if (!vehicleDetails.make || !vehicleDetails.model) {
+        return {
+          success: false,
+          error: 'Could not decode last 6 digits. Please verify the digits are correct.',
+        };
+      }
+    } else {
+      if (!vehicleDetails.year || !vehicleDetails.make || !vehicleDetails.model) {
+        return {
+          success: false,
+          error: 'Could not decode VIN. Please verify the VIN is correct.',
+        };
+      }
     }
 
     return {
       success: true,
       data: vehicleDetails,
+      isPartial: partialVin,
     };
   } catch (error: any) {
     console.error('VIN decode error:', error);

@@ -8,7 +8,7 @@ import { decodeVIN } from '@/lib/vin-decoder';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { vin } = body;
+    const { vin, partialVin = false } = body;
 
     if (!vin) {
       return NextResponse.json(
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await decodeVIN(vin);
+    const result = await decodeVIN(vin, partialVin);
 
     if (!result.success) {
       return NextResponse.json(
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       data: result.data,
+      isPartial: result.isPartial,
     });
   } catch (error: any) {
     console.error('VIN decode API error:', error);

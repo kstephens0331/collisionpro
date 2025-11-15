@@ -1,0 +1,14 @@
+[build]
+builder = "NIXPACKS"
+
+[build.nixpacksConfig]
+nixpkgsVersion = "23.11"
+
+[deploy]
+startCommand = "npm run scrape:schedule"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Force Node.js 20+
+[env]
+NODE_VERSION = "20.11.0"

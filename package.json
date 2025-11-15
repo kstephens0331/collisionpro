@@ -10,7 +10,8 @@
     "lint": "next lint",
     "db:setup": "node scripts/setup-db.js",
     "scrape": "tsx scripts/run-scrapers.ts",
-    "scrape:schedule": "tsx scripts/run-scrapers.ts schedule"
+    "scrape:schedule": "tsx scripts/run-scrapers.ts schedule",
+    "test:scraper": "tsx scripts/test-scraper.ts"
   },
   "private": true,
   "keywords": [],

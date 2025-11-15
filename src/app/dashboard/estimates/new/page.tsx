@@ -15,6 +15,7 @@ import {
   Car,
   FileText,
   Shield,
+  Sparkles,
 } from "lucide-react";
 
 type FormStep = "customer" | "vehicle" | "insurance" | "damage";
@@ -57,6 +58,7 @@ export default function NewEstimatePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<FormStep>("customer");
   const [loading, setLoading] = useState(false);
+  const [decodingVIN, setDecodingVIN] = useState(false);
   const [formData, setFormData] = useState<EstimateFormData>({
     customerName: "",
     customerEmail: "",
@@ -96,6 +98,45 @@ export default function NewEstimatePage() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDecodeVIN = async () => {
+    const vin = formData.vehicleVin.trim();
+
+    if (!vin || vin.length !== 17) {
+      alert("Please enter a valid 17-character VIN");
+      return;
+    }
+
+    setDecodingVIN(true);
+    try {
+      const response = await fetch("/api/vin/decode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vin }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const vehicle = data.data;
+        setFormData((prev) => ({
+          ...prev,
+          vehicleYear: vehicle.year?.toString() || prev.vehicleYear,
+          vehicleMake: vehicle.make || prev.vehicleMake,
+          vehicleModel: vehicle.model || prev.vehicleModel,
+          vehicleTrim: vehicle.trim || prev.vehicleTrim,
+        }));
+        alert("VIN decoded successfully! Vehicle details have been filled in.");
+      } else {
+        alert(data.error || "Failed to decode VIN. Please verify the VIN is correct.");
+      }
+    } catch (error) {
+      console.error("Error decoding VIN:", error);
+      alert("Failed to decode VIN. Please try again.");
+    } finally {
+      setDecodingVIN(false);
+    }
   };
 
   const validateStep = (): boolean => {
@@ -362,16 +403,31 @@ export default function NewEstimatePage() {
                   placeholder="EX-L"
                 />
               </div>
-              <div>
+              <div className="md:col-span-2">
                 <Label htmlFor="vehicleVin">VIN</Label>
-                <Input
-                  id="vehicleVin"
-                  name="vehicleVin"
-                  value={formData.vehicleVin}
-                  onChange={handleInputChange}
-                  placeholder="1HGBH41JXMN109186"
-                  maxLength={17}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="vehicleVin"
+                    name="vehicleVin"
+                    value={formData.vehicleVin}
+                    onChange={handleInputChange}
+                    placeholder="1HGBH41JXMN109186"
+                    maxLength={17}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDecodeVIN}
+                    disabled={decodingVIN || formData.vehicleVin.length !== 17}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    {decodingVIN ? "Decoding..." : "Decode VIN"}
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter 17-character VIN and click Decode to auto-fill vehicle details
+                </p>
               </div>
               <div>
                 <Label htmlFor="vehicleMileage">Mileage</Label>

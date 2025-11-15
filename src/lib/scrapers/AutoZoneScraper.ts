@@ -105,7 +105,7 @@ export class AutoZoneScraper extends BaseScraper {
       await this.randomDelay(500, 1500);
 
       // Wait for page to fully load
-      await page.waitForTimeout(5000);
+      await this.randomDelay(5000, 5000);
 
       // Try multiple selectors
       const selectors = [

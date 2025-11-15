@@ -76,6 +76,11 @@ export abstract class BaseScraper {
    */
   protected async upsertPart(scrapedPart: ScrapedPart): Promise<{ added: boolean; updated: boolean }> {
     try {
+      // FILTER: Only accept NEW parts (no used, refurbished, recycled)
+      if (scrapedPart.condition !== 'new') {
+        return { added: false, updated: false };
+      }
+
       const partHash = this.generatePartHash(scrapedPart.partNumber, this.supplierCode);
 
       // Check if part already exists

@@ -30,16 +30,55 @@ export class AutoZoneScraper extends BaseScraper {
 
     try {
       const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: 'new', // New headless mode (harder to detect)
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-blink-features=AutomationControlled', // Hide automation
+          '--disable-features=IsolateOrigins,site-per-process',
+          '--disable-web-security',
+          '--window-size=1920,1080',
+        ],
       });
 
       const page = await browser.newPage();
+
+      // Set viewport
+      await page.setViewport({ width: 1920, height: 1080 });
 
       // Set realistic user agent
       await page.setUserAgent(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       );
+
+      // Remove webdriver flag
+      await page.evaluateOnNewDocument(() => {
+        Object.defineProperty(navigator, 'webdriver', {
+          get: () => false,
+        });
+      });
+
+      // Add realistic navigator properties
+      await page.evaluateOnNewDocument(() => {
+        // @ts-ignore
+        window.navigator.chrome = {
+          runtime: {},
+        };
+        Object.defineProperty(navigator, 'languages', {
+          get: () => ['en-US', 'en'],
+        });
+        Object.defineProperty(navigator, 'plugins', {
+          get: () => [1, 2, 3, 4, 5],
+        });
+      });
+
+      // Set extra headers
+      await page.setExtraHTTPHeaders({
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Referer': 'https://www.google.com/',
+      });
 
       // Build search URL for AutoZone
       // Format: https://www.autozone.com/search?searchText=bumper+cover&year=2020&make=Honda&model=Civic
@@ -54,14 +93,46 @@ export class AutoZoneScraper extends BaseScraper {
       const url = `${baseUrl}?${params}`;
       console.log(`📍 Navigating to: ${url}`);
 
-      await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+      // Random delay before loading (human-like)
+      await this.randomDelay(1000, 3000);
 
-      // Wait for product listings to load
-      await page.waitForSelector('[data-testid="product-card"], .product-card, .search-result-item', {
-        timeout: 10000,
-      }).catch(() => {
-        console.log('⚠️  No products found or different page structure');
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+      // Random scroll (human-like behavior)
+      await page.evaluate(() => {
+        window.scrollTo(0, Math.floor(Math.random() * 500));
       });
+      await this.randomDelay(500, 1500);
+
+      // Wait for page to fully load
+      await page.waitForTimeout(5000);
+
+      // Try multiple selectors
+      const selectors = [
+        '[data-testid="product-card"]',
+        '.product-card',
+        '.search-result-item',
+        '[class*="ProductCard"]',
+        '[class*="product"]',
+      ];
+
+      let foundSelector = null;
+      for (const selector of selectors) {
+        const count = await page.$$eval(selector, els => els.length);
+        if (count > 0) {
+          foundSelector = selector;
+          console.log(`✅ Found ${count} products using selector: ${selector}`);
+          break;
+        }
+      }
+
+      if (!foundSelector) {
+        console.log('⚠️  No products found with any selector');
+
+        // Save HTML for debugging
+        const html = await page.content();
+        console.log('First 500 chars of HTML:', html.substring(0, 500));
+      }
 
       // Extract product data
       const productData = await page.evaluate(() => {
@@ -158,5 +229,13 @@ export class AutoZoneScraper extends BaseScraper {
     }
 
     return parts;
+  }
+
+  /**
+   * Random delay to mimic human behavior
+   */
+  private randomDelay(min: number, max: number): Promise<void> {
+    const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+    return new Promise(resolve => setTimeout(resolve, delay));
   }
 }

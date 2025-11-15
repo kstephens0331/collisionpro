@@ -8,3 +8,6 @@ next-env.d.ts
 /generated
 
 .vercel
+
+# Claude AI
+.claude/

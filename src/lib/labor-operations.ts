@@ -57,6 +57,12 @@ export interface ShopSettings {
   website?: string;
   taxId?: string;
   licenseNumber?: string;
+
+  // Email Configuration (for sending estimates)
+  senderEmail?: string; // Email address estimates are sent from
+  senderName?: string; // Display name for sender
+  replyToEmail?: string; // Email for customer replies
+  emailDomainVerified?: boolean; // Is the domain verified with Resend?
 }
 
 /**

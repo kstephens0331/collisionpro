@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wrench, DollarSign, Palette, Building2, Save, Loader2 } from "lucide-react";
+import { Wrench, DollarSign, Palette, Building2, Save, Loader2, Mail } from "lucide-react";
 import { ShopSettings, DEFAULT_SHOP_SETTINGS } from "@/lib/labor-operations";
 
 export default function SettingsPage() {
@@ -169,6 +169,10 @@ export default function SettingsPage() {
           <TabsTrigger value="business">
             <Building2 className="h-4 w-4 mr-2" />
             Business Info
+          </TabsTrigger>
+          <TabsTrigger value="email">
+            <Mail className="h-4 w-4 mr-2" />
+            Email Settings
           </TabsTrigger>
         </TabsList>
 
@@ -540,6 +544,136 @@ export default function SettingsPage() {
                   onChange={(e) => updateSetting("licenseNumber", e.target.value)}
                   placeholder="TX123456"
                 />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* EMAIL SETTINGS TAB */}
+        <TabsContent value="email">
+          <Card>
+            <CardHeader>
+              <CardTitle>Email Configuration</CardTitle>
+              <CardDescription>
+                Configure the email address used to send estimates to customers. These emails come from your shop, not CollisionPro.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-blue-900 mb-2">📧 How Email Works</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Estimates are sent from <strong>your shop's email address</strong>, not CollisionPro</li>
+                  <li>• Customers see your branding and can reply directly to you</li>
+                  <li>• You must verify your domain with Resend (our email provider)</li>
+                  <li>• Professional email delivery with tracking and analytics</li>
+                </ul>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <Label htmlFor="senderEmail">Sender Email Address *</Label>
+                  <Input
+                    id="senderEmail"
+                    type="email"
+                    value={settings.senderEmail || ""}
+                    onChange={(e) => updateSetting("senderEmail", e.target.value)}
+                    placeholder="estimates@yourshop.com"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    The email address estimates will be sent from (e.g., estimates@yourshop.com)
+                  </p>
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="senderName">Sender Display Name</Label>
+                  <Input
+                    id="senderName"
+                    value={settings.senderName || ""}
+                    onChange={(e) => updateSetting("senderName", e.target.value)}
+                    placeholder="Joe's Auto Body"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    The name customers will see in their inbox (e.g., "Joe's Auto Body")
+                  </p>
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="replyToEmail">Reply-To Email (Optional)</Label>
+                  <Input
+                    id="replyToEmail"
+                    type="email"
+                    value={settings.replyToEmail || ""}
+                    onChange={(e) => updateSetting("replyToEmail", e.target.value)}
+                    placeholder="contact@yourshop.com"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Where customer replies should go (if different from sender email)
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t pt-6">
+                <h3 className="text-sm font-semibold mb-3">Domain Verification Status</h3>
+                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                  {settings.emailDomainVerified ? (
+                    <>
+                      <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">Domain Verified ✓</p>
+                        <p className="text-xs text-gray-600">Your domain is verified and ready to send emails</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex-shrink-0 w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">Domain Not Verified</p>
+                        <p className="text-xs text-gray-600">You need to verify your domain before sending emails</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open("https://resend.com/domains", "_blank")}
+                      >
+                        Verify Domain
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {!settings.emailDomainVerified && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 className="text-sm font-semibold text-yellow-900 mb-2">🔐 Domain Verification Required</h4>
+                    <ol className="text-sm text-yellow-800 space-y-1 list-decimal list-inside">
+                      <li>Create a free Resend account at <a href="https://resend.com" target="_blank" rel="noopener noreferrer" className="underline">resend.com</a></li>
+                      <li>Add your domain (e.g., yourshop.com) in Resend dashboard</li>
+                      <li>Add the DNS records provided by Resend to your domain registrar</li>
+                      <li>Wait for verification (usually 5-10 minutes)</li>
+                      <li>Check the "Domain Verified" checkbox above once complete</li>
+                    </ol>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t pt-6">
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={settings.emailDomainVerified || false}
+                    onChange={(e) => updateSetting("emailDomainVerified", e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">
+                    My domain is verified with Resend and ready to send emails
+                  </span>
+                </label>
               </div>
             </CardContent>
           </Card>

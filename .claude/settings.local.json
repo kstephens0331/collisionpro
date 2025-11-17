@@ -27,7 +27,11 @@
       "Bash(curl:*)",
       "Bash(dir:*)",
       "Bash(test:*)",
-      "Bash(npm run scrape:*)"
+      "Bash(npm run scrape:*)",
+      "Bash(node scripts/add-labor-operations.js:*)",
+      "Bash(move:*)",
+      "Bash(del \"c:\\Users\\usmc3\\OneDrive\\Documents\\Stephens Code Programs\\collisionpro\\migrations\\phase-2\\2.9-email-delivery.sql\")",
+      "Bash(del \"c:\\Users\\usmc3\\OneDrive\\Documents\\Stephens Code Programs\\collisionpro\\migrations\\phase-2\\2.9-email-delivery-fixed.sql\")"
     ],
     "deny": [],
     "ask": []

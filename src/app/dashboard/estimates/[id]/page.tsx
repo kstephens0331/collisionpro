@@ -19,7 +19,11 @@ import {
   Car,
   Shield,
   DollarSign,
+  Wrench,
+  Package,
 } from "lucide-react";
+import LaborOperationSelector from "@/components/estimates/LaborOperationSelector";
+import { LaborOperation, ShopSettings, calculateLaborCost } from "@/lib/labor-operations";
 
 interface Estimate {
   id: string;
@@ -75,11 +79,16 @@ export default function EstimateDetailPage() {
 
   const [estimate, setEstimate] = useState<Estimate | null>(null);
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
+  const [shopSettings, setShopSettings] = useState<ShopSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  // Modal states
+  const [showLaborSelector, setShowLaborSelector] = useState(false);
+  const [showAddItem, setShowAddItem] = useState(false);
 
   // New line item form
-  const [showAddItem, setShowAddItem] = useState(false);
   const [newItem, setNewItem] = useState({
     type: "part" as "part" | "labor" | "paint" | "misc",
     partName: "",
@@ -93,6 +102,7 @@ export default function EstimateDetailPage() {
   useEffect(() => {
     fetchEstimate();
     fetchLineItems();
+    fetchShopSettings();
   }, [estimateId]);
 
   const fetchEstimate = async () => {
@@ -118,6 +128,20 @@ export default function EstimateDetailPage() {
       }
     } catch (error) {
       console.error("Error fetching line items:", error);
+    }
+  };
+
+  const fetchShopSettings = async () => {
+    try {
+      const shopId = "shop_demo";
+      const response = await fetch(`/api/shop-settings?shopId=${shopId}`);
+      const data = await response.json();
+
+      if (data.success && data.settings) {
+        setShopSettings(data.settings);
+      }
+    } catch (error) {
+      console.error("Error loading shop settings:", error);
     }
   };
 
@@ -190,6 +214,99 @@ export default function EstimateDetailPage() {
     }
   };
 
+  const handleAddLaborOperation = async (
+    operation: LaborOperation,
+    customHours?: number
+  ) => {
+    if (!shopSettings) {
+      alert("Shop settings not loaded. Please try again.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // Calculate labor cost based on operation category and shop settings
+      const { hours, rate, cost } = calculateLaborCost(
+        operation,
+        shopSettings,
+        customHours
+      );
+
+      const response = await fetch(`/api/estimates/${estimateId}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "labor",
+          partName: operation.operation,
+          partNumber: null,
+          laborOperation: operation.code,
+          laborHours: hours,
+          quantity: 1,
+          unitPrice: cost, // Total labor cost (hours × rate)
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        fetchLineItems();
+        fetchEstimate(); // Refresh totals
+        setShowLaborSelector(false);
+      } else {
+        alert("Failed to add labor operation: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error adding labor operation:", error);
+      alert("Failed to add labor operation");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSendToCustomer = async () => {
+    if (!estimate) return;
+
+    // Validate customer email exists
+    if (!estimate.customerEmail || estimate.customerEmail.trim() === "") {
+      alert("Customer email is required to send the estimate. Please edit the estimate and add a customer email.");
+      return;
+    }
+
+    // Validate shop email is configured
+    if (!shopSettings?.senderEmail || shopSettings.senderEmail.trim() === "") {
+      alert("Shop email is not configured. Please configure your email settings in Shop Settings before sending estimates.");
+      router.push("/dashboard/settings");
+      return;
+    }
+
+    // Confirm before sending
+    if (!confirm(`Send estimate to ${estimate.customerEmail}?`)) {
+      return;
+    }
+
+    setSending(true);
+    try {
+      const response = await fetch(`/api/estimates/${estimateId}/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`✅ Estimate sent successfully to ${estimate.customerEmail}!`);
+        // Refresh estimate to show updated status
+        fetchEstimate();
+      } else {
+        alert(`❌ Failed to send estimate: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Error sending estimate:", error);
+      alert("Failed to send estimate. Please try again.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -240,9 +357,13 @@ export default function EstimateDetailPage() {
             PDF
           </Button>
           {estimate.status === "draft" && (
-            <Button size="sm">
+            <Button
+              size="sm"
+              onClick={handleSendToCustomer}
+              disabled={sending}
+            >
               <Send className="h-4 w-4 mr-2" />
-              Send to Customer
+              {sending ? "Sending..." : "Send to Customer"}
             </Button>
           )}
         </div>
@@ -395,10 +516,21 @@ export default function EstimateDetailPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Line Items</CardTitle>
-            <Button size="sm" onClick={() => setShowAddItem(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Item
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowLaborSelector(true)}
+                disabled={!shopSettings}
+              >
+                <Wrench className="h-4 w-4 mr-2" />
+                Add Labor
+              </Button>
+              <Button size="sm" onClick={() => setShowAddItem(true)}>
+                <Package className="h-4 w-4 mr-2" />
+                Add Part
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -663,6 +795,14 @@ export default function EstimateDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Labor Operation Selector Modal */}
+      {showLaborSelector && (
+        <LaborOperationSelector
+          onSelect={handleAddLaborOperation}
+          onClose={() => setShowLaborSelector(false)}
+        />
+      )}
     </div>
   );
 }

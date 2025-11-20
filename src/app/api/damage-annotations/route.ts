@@ -31,9 +31,9 @@ export async function POST(request: NextRequest) {
 
     // Check if annotation already exists for this estimate
     const { data: existing } = await supabaseAdmin
-      .from('damage_annotations')
+      .from('DamageAnnotation')
       .select('id')
-      .eq('estimate_id', estimateId)
+      .eq('estimateId', estimateId)
       .single();
 
     let result;
@@ -41,14 +41,14 @@ export async function POST(request: NextRequest) {
     if (existing) {
       // Update existing annotation
       const { data, error } = await supabaseAdmin
-        .from('damage_annotations')
+        .from('DamageAnnotation')
         .update({
-          vehicle_type: vehicleType || 'sedan',
+          vehicleType: vehicleType || 'sedan',
           markers,
-          camera_position: cameraPosition || null,
-          updated_at: new Date().toISOString(),
+          cameraPosition: cameraPosition || null,
+          updatedAt: new Date().toISOString(),
         })
-        .eq('estimate_id', estimateId)
+        .eq('estimateId', estimateId)
         .select()
         .single();
 
@@ -56,13 +56,15 @@ export async function POST(request: NextRequest) {
       result = data;
     } else {
       // Create new annotation
+      const id = `dmg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const { data, error } = await supabaseAdmin
-        .from('damage_annotations')
+        .from('DamageAnnotation')
         .insert({
-          estimate_id: estimateId,
-          vehicle_type: vehicleType || 'sedan',
+          id,
+          estimateId: estimateId,
+          vehicleType: vehicleType || 'sedan',
           markers,
-          camera_position: cameraPosition || null,
+          cameraPosition: cameraPosition || null,
         })
         .select()
         .single();
@@ -101,9 +103,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('damage_annotations')
+      .from('DamageAnnotation')
       .select('*')
-      .eq('estimate_id', estimateId)
+      .eq('estimateId', estimateId)
       .single();
 
     if (error) {
@@ -126,12 +128,12 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         id: data.id,
-        estimateId: data.estimate_id,
-        vehicleType: data.vehicle_type,
+        estimateId: data.estimateId,
+        vehicleType: data.vehicleType,
         markers: data.markers,
-        cameraPosition: data.camera_position,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        cameraPosition: data.cameraPosition,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
       },
     });
   } catch (error: any) {

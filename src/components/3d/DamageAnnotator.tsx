@@ -34,7 +34,7 @@ import {
   getMarkerColor,
 } from "@/lib/3d/damage-markers";
 import { trackViewerOpened, trackMarkerAdded, trackMarkersSaved } from "@/lib/analytics/3d-viewer-analytics";
-import ImprovedVehicle from "@/components/3d/models/ImprovedVehicle";
+import ProfessionalVehicle from "@/components/3d/models/ProfessionalVehicle";
 
 interface DamageAnnotatorProps {
   estimateId: string;
@@ -55,6 +55,7 @@ export default function DamageAnnotator({
   const [newDamageType, setNewDamageType] = useState<DamageType>("dent");
   const [newSeverity, setNewSeverity] = useState<DamageSeverity>("moderate");
   const [newDescription, setNewDescription] = useState("");
+  const [vehicleColor, setVehicleColor] = useState("#2563eb");
 
   // Track viewer opened on mount
   useEffect(() => {
@@ -105,6 +106,7 @@ export default function DamageAnnotator({
               newDamageType={newDamageType}
               newSeverity={newSeverity}
               newDescription={newDescription}
+              vehicleColor={vehicleColor}
               onMarkerClick={(id) => setSelectedMarker(id)}
               onAddMarker={handleAddMarker}
             />
@@ -137,6 +139,24 @@ export default function DamageAnnotator({
 
       {/* Sidebar */}
       <div className="w-80 space-y-4">
+        {/* Vehicle Color Picker */}
+        <Card className="p-4">
+          <h3 className="font-semibold mb-3">Vehicle Color</h3>
+          <div className="flex items-center gap-3">
+            <Input
+              type="color"
+              value={vehicleColor}
+              onChange={(e) => setVehicleColor(e.target.value)}
+              className="w-20 h-10 cursor-pointer"
+            />
+            <div className="flex-1">
+              <p className="text-sm text-gray-600">
+                Choose vehicle color
+              </p>
+            </div>
+          </div>
+        </Card>
+
         {/* Add Marker Controls */}
         <Card className="p-4">
           <h3 className="font-semibold mb-3">Add Damage Marker</h3>
@@ -290,6 +310,7 @@ function SceneWithMarkers({
   newDamageType,
   newSeverity,
   newDescription,
+  vehicleColor,
   onMarkerClick,
   onAddMarker,
 }: {
@@ -299,27 +320,22 @@ function SceneWithMarkers({
   newDamageType: DamageType;
   newSeverity: DamageSeverity;
   newDescription: string;
+  vehicleColor: string;
   onMarkerClick: (id: string) => void;
   onAddMarker: (marker: DamageMarker) => void;
 }) {
   const { camera, raycaster, scene } = useThree();
   const vehicleRef = useRef<THREE.Group>(null);
 
-  const handleClick = (event: any) => {
-    if (!addMode || !vehicleRef.current) return;
+  const handleVehicleClick = (event: any) => {
+    if (!addMode) return;
 
-    // Calculate mouse position in normalized device coordinates
-    const rect = event.target.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    // Prevent event from bubbling
+    event.stopPropagation();
 
-    // Raycast to find intersection with vehicle
-    const mouse = new THREE.Vector2(x, y);
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(vehicleRef.current.children, true);
-
-    if (intersects.length > 0) {
-      const point = intersects[0].point;
+    // React Three Fiber's onClick event contains the intersection point
+    if (event.point) {
+      const point = event.point;
       const newMarker = createDamageMarker(
         { x: point.x, y: point.y, z: point.z },
         newDamageType,
@@ -331,9 +347,11 @@ function SceneWithMarkers({
   };
 
   return (
-    <group onClick={handleClick}>
-      {/* Improved Vehicle */}
-      <ImprovedVehicle ref={vehicleRef} vehicleType="sedan" />
+    <>
+      {/* Professional Vehicle with click handler */}
+      <group ref={vehicleRef} onClick={handleVehicleClick}>
+        <ProfessionalVehicle vehicleType="sedan" color={vehicleColor} />
+      </group>
 
       {/* Damage Markers */}
       {markers.map((marker) => (
@@ -344,7 +362,7 @@ function SceneWithMarkers({
           onClick={() => onMarkerClick(marker.id)}
         />
       ))}
-    </group>
+    </>
   );
 }
 

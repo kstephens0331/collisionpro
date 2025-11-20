@@ -168,9 +168,20 @@ export default function OrderPartsModal({
                 Select Supplier
               </label>
               {suppliers.length === 0 ? (
-                <p className="text-sm text-red-600">
-                  No suppliers configured. Please add suppliers in Settings.
-                </p>
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-800 font-medium mb-2">
+                    No suppliers configured
+                  </p>
+                  <p className="text-xs text-yellow-700 mb-3">
+                    You need to add at least one supplier before you can order parts.
+                  </p>
+                  <a
+                    href="/dashboard/suppliers"
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                  >
+                    Add Suppliers
+                  </a>
+                </div>
               ) : (
                 <select
                   value={selectedSupplier}

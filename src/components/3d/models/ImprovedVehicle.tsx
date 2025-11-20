@@ -3,10 +3,12 @@
 import { forwardRef, useMemo } from "react";
 import * as THREE from "three";
 
-export type VehicleType = "sedan" | "suv" | "truck" | "coupe";
+export type VehicleType = "sedan" | "suv" | "truck" | "coupe" | "van";
+export type DoorConfig = "2door" | "4door" | "sliding";
 
 interface ImprovedVehicleProps {
   vehicleType?: VehicleType;
+  doorConfig?: DoorConfig;
   color?: string;
 }
 
@@ -15,8 +17,11 @@ interface ImprovedVehicleProps {
  * Uses rounded geometries and proper automotive shapes
  */
 const ImprovedVehicle = forwardRef<THREE.Group, ImprovedVehicleProps>(
-  ({ vehicleType = "sedan", color = "#2563eb" }, ref) => {
+  ({ vehicleType = "sedan", doorConfig, color = "#2563eb" }, ref) => {
     const config = useMemo(() => getVehicleConfig(vehicleType), [vehicleType]);
+
+    // Auto-determine door config if not specified
+    const doors = doorConfig || getDefaultDoorConfig(vehicleType);
 
     // Premium automotive materials
     const paintMaterial = new THREE.MeshPhysicalMaterial({
@@ -148,32 +153,115 @@ const ImprovedVehicle = forwardRef<THREE.Group, ImprovedVehicleProps>(
           <primitive object={glassMaterial} />
         </mesh>
 
-        {/* DOORS - Rounded edges */}
-        {/* Front Left Door */}
-        <mesh
-          position={[-config.width / 2, config.doorY, config.frontDoorZ]}
-          castShadow
-          receiveShadow
-          name="door_left_front"
-        >
-          <boxGeometry args={[0.08, config.doorH, config.doorLength, 4, 8, 8]} />
-          <primitive object={paintMaterial} />
-        </mesh>
-
-        {/* Front Right Door */}
-        <mesh
-          position={[config.width / 2, config.doorY, config.frontDoorZ]}
-          castShadow
-          receiveShadow
-          name="door_right_front"
-        >
-          <boxGeometry args={[0.08, config.doorH, config.doorLength, 4, 8, 8]} />
-          <primitive object={paintMaterial} />
-        </mesh>
-
-        {/* Rear Doors - if not coupe */}
-        {vehicleType !== "coupe" && (
+        {/* DOORS - Configurable: 2-door, 4-door, or sliding */}
+        {doors === "sliding" ? (
+          /* Van with sliding doors */
           <>
+            {/* Front Left Door */}
+            <mesh
+              position={[-config.width / 2, config.doorY, config.frontDoorZ]}
+              castShadow
+              receiveShadow
+              name="door_left_front"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength, 4, 8, 8]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+
+            {/* Front Right Door */}
+            <mesh
+              position={[config.width / 2, config.doorY, config.frontDoorZ]}
+              castShadow
+              receiveShadow
+              name="door_right_front"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength, 4, 8, 8]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+
+            {/* Sliding Door - Left (larger) */}
+            <mesh
+              position={[-config.width / 2, config.doorY, config.rearDoorZ - 0.3]}
+              castShadow
+              receiveShadow
+              name="door_left_sliding"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength * 1.6, 4, 8, 12]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+
+            {/* Sliding Door - Right (larger) */}
+            <mesh
+              position={[config.width / 2, config.doorY, config.rearDoorZ - 0.3]}
+              castShadow
+              receiveShadow
+              name="door_right_sliding"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength * 1.6, 4, 8, 12]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+
+            {/* Door track lines */}
+            <mesh position={[-config.width / 2 + 0.05, config.doorY + config.doorH / 2 + 0.05, config.rearDoorZ - 0.3]}>
+              <boxGeometry args={[0.04, 0.02, config.doorLength * 1.5]} />
+              <meshStandardMaterial color="#404040" metalness={0.6} roughness={0.4} />
+            </mesh>
+            <mesh position={[config.width / 2 - 0.05, config.doorY + config.doorH / 2 + 0.05, config.rearDoorZ - 0.3]}>
+              <boxGeometry args={[0.04, 0.02, config.doorLength * 1.5]} />
+              <meshStandardMaterial color="#404040" metalness={0.6} roughness={0.4} />
+            </mesh>
+          </>
+        ) : doors === "2door" ? (
+          /* 2-door: Only front doors */
+          <>
+            {/* Front Left Door (larger for 2-door) */}
+            <mesh
+              position={[-config.width / 2, config.doorY, (config.frontDoorZ + config.rearDoorZ) / 2]}
+              castShadow
+              receiveShadow
+              name="door_left_front"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength * 1.8, 4, 8, 12]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+
+            {/* Front Right Door (larger for 2-door) */}
+            <mesh
+              position={[config.width / 2, config.doorY, (config.frontDoorZ + config.rearDoorZ) / 2]}
+              castShadow
+              receiveShadow
+              name="door_right_front"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength * 1.8, 4, 8, 12]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+          </>
+        ) : (
+          /* 4-door: Front and rear doors */
+          <>
+            {/* Front Left Door */}
+            <mesh
+              position={[-config.width / 2, config.doorY, config.frontDoorZ]}
+              castShadow
+              receiveShadow
+              name="door_left_front"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength, 4, 8, 8]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+
+            {/* Front Right Door */}
+            <mesh
+              position={[config.width / 2, config.doorY, config.frontDoorZ]}
+              castShadow
+              receiveShadow
+              name="door_right_front"
+            >
+              <boxGeometry args={[0.08, config.doorH, config.doorLength, 4, 8, 8]} />
+              <primitive object={paintMaterial} />
+            </mesh>
+
+            {/* Rear Left Door */}
             <mesh
               position={[-config.width / 2, config.doorY, config.rearDoorZ]}
               castShadow
@@ -183,6 +271,8 @@ const ImprovedVehicle = forwardRef<THREE.Group, ImprovedVehicleProps>(
               <boxGeometry args={[0.08, config.doorH, config.doorLength * 0.9, 4, 8, 8]} />
               <primitive object={paintMaterial} />
             </mesh>
+
+            {/* Rear Right Door */}
             <mesh
               position={[config.width / 2, config.doorY, config.rearDoorZ]}
               castShadow
@@ -527,9 +617,68 @@ function getVehicleConfig(type: VehicleType) {
       frontBumperZ: 2.15,
       rearBumperZ: -2.15,
     },
+    van: {
+      width: 2.0,
+      length: 5.0,
+      wheelbase: 3.0,
+      wheelRadius: 0.38,
+      wheelTrack: 0.88,
+      groundClearance: 0.22,
+      bodyH: 1.4,
+      bodyHeight: 1.0,
+      roofWidth: 1.95,
+      roofLength: 3.2,
+      roofY: 2.3,
+      roofZ: -0.2,
+      hoodLength: 1.2,
+      hoodY: 1.55,
+      hoodZ: 1.5,
+      hoodAngle: -0.08,
+      trunkLength: 1.4,
+      trunkY: 1.8,
+      trunkZ: -1.8,
+      trunkAngle: -0.5,
+      windshieldY: 2.2,
+      windshieldZ: 0.85,
+      windshieldAngle: 0.25,
+      rearWindowY: 2.1,
+      rearWindowZ: -1.35,
+      rearWindowAngle: -0.6,
+      windowY: 1.9,
+      windowTilt: 0.0,
+      doorY: 1.2,
+      doorH: 1.5,
+      doorLength: 1.3,
+      frontDoorZ: 0.85,
+      rearDoorZ: -0.85,
+      fenderY: 0.75,
+      fenderH: 0.95,
+      frontWheelZ: 1.5,
+      rearWheelZ: -1.5,
+      bumperY: 0.5,
+      frontBumperZ: 2.5,
+      rearBumperZ: -2.5,
+    },
   };
 
   return configs[type];
+}
+
+/**
+ * Get default door configuration for vehicle type
+ */
+function getDefaultDoorConfig(vehicleType: VehicleType): DoorConfig {
+  switch (vehicleType) {
+    case "coupe":
+      return "2door";
+    case "van":
+      return "sliding";
+    case "sedan":
+    case "suv":
+    case "truck":
+    default:
+      return "4door";
+  }
 }
 
 export default ImprovedVehicle;

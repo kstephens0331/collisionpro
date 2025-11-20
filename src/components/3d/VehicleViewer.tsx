@@ -22,7 +22,7 @@ import { captureScreenshot, downloadScreenshot } from "@/lib/3d/screenshot-captu
 import { type DamageMarker, DAMAGE_TYPES } from "@/lib/3d/damage-markers";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
-import ImprovedVehicle from "@/components/3d/models/ImprovedVehicle";
+import ProfessionalVehicle from "@/components/3d/models/ProfessionalVehicle";
 
 interface VehicleViewerProps {
   vehicleType?: "sedan" | "suv" | "truck" | "coupe";
@@ -40,6 +40,7 @@ export default function VehicleViewer({
   const [selectedCamera, setSelectedCamera] = useState<string>("isometric");
   const [loading, setLoading] = useState(true);
   const [markers, setMarkers] = useState<DamageMarker[]>([]);
+  const [vehicleColor, setVehicleColor] = useState("#2563eb");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Load damage markers if in view mode
@@ -86,8 +87,8 @@ export default function VehicleViewer({
             {/* Scene Setup */}
             <SceneSetup selectedCamera={selectedCamera} />
 
-            {/* Improved Vehicle Model */}
-            <ImprovedVehicle vehicleType={vehicleType} />
+            {/* Professional Vehicle Model */}
+            <ProfessionalVehicle vehicleType={vehicleType} color={vehicleColor} />
 
             {/* Damage Markers (view mode) */}
             {mode === "view" && markers.map((marker) => (
@@ -132,6 +133,21 @@ export default function VehicleViewer({
             </div>
           </div>
         )}
+
+        {/* Vehicle Color Picker */}
+        <div className="absolute top-4 left-4 z-10">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+            <label className="block text-xs font-medium text-gray-700 mb-2">
+              Vehicle Color
+            </label>
+            <input
+              type="color"
+              value={vehicleColor}
+              onChange={(e) => setVehicleColor(e.target.value)}
+              className="w-20 h-10 cursor-pointer rounded border border-gray-300"
+            />
+          </div>
+        </div>
 
         {/* Camera Preset Buttons */}
         <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
@@ -185,7 +201,7 @@ export default function VehicleViewer({
         </div>
 
         {/* Instructions */}
-        <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg p-3 text-xs text-gray-600 shadow-lg">
+        <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg p-3 text-xs text-gray-600 shadow-lg" style={{marginTop: "100px"}}>
           <p className="font-medium mb-1">Controls:</p>
           <ul className="space-y-1">
             <li>• <strong>Left Click + Drag</strong>: Rotate</li>

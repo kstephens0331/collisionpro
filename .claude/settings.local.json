@@ -44,7 +44,14 @@
       "Bash(node scripts/check-migrations.js:*)",
       "Bash(node scripts/run-all-migrations.js:*)",
       "Bash(del nul 2)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(node scripts/run-phase3-migration.js:*)",
+      "Bash(node scripts/create-damage-annotations-table.js:*)",
+      "Bash(node scripts/rockauto-scraper.js:*)",
+      "Bash(node scripts/check-tables-schema.js:*)",
+      "Bash(node scripts/check-vehiclemodel-schema.js:*)",
+      "Bash(if exist nul del /F nul 2)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

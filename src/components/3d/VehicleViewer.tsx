@@ -22,6 +22,7 @@ import { captureScreenshot, downloadScreenshot } from "@/lib/3d/screenshot-captu
 import { type DamageMarker, DAMAGE_TYPES } from "@/lib/3d/damage-markers";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
+import RealisticVehicle from "@/components/3d/models/RealisticVehicle";
 
 interface VehicleViewerProps {
   vehicleType?: "sedan" | "suv" | "truck" | "coupe";
@@ -85,8 +86,8 @@ export default function VehicleViewer({
             {/* Scene Setup */}
             <SceneSetup selectedCamera={selectedCamera} />
 
-            {/* Vehicle Model (placeholder for now) */}
-            <GenericVehicle vehicleType={vehicleType} />
+            {/* Realistic Vehicle Model */}
+            <RealisticVehicle vehicleType={vehicleType} />
 
             {/* Damage Markers (view mode) */}
             {mode === "view" && markers.map((marker) => (
@@ -242,83 +243,7 @@ function SceneSetup({ selectedCamera }: { selectedCamera: string }) {
   return null;
 }
 
-/**
- * Generic vehicle model (placeholder)
- * In production, this would load actual GLTF models
- */
-function GenericVehicle({ vehicleType }: { vehicleType: string }) {
-  const meshRef = useRef<any>(null);
-
-  useFrame(() => {
-    // Subtle idle animation (optional)
-    if (meshRef.current) {
-      meshRef.current.rotation.y = Math.sin(Date.now() * 0.0005) * 0.01;
-    }
-  });
-
-  return (
-    <group ref={meshRef}>
-      {/* Car Body (simplified box for now) */}
-      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2, 0.8, 4]} />
-        <meshStandardMaterial color="#3b82f6" metalness={0.6} roughness={0.4} />
-      </mesh>
-
-      {/* Car Top (cabin) */}
-      <mesh position={[0, 1.2, -0.3]} castShadow>
-        <boxGeometry args={[1.8, 0.6, 2]} />
-        <meshStandardMaterial color="#1e40af" metalness={0.5} roughness={0.5} />
-      </mesh>
-
-      {/* Windows (front) */}
-      <mesh position={[0, 1.2, 0.5]} castShadow>
-        <boxGeometry args={[1.7, 0.5, 0.1]} />
-        <meshStandardMaterial
-          color="#60a5fa"
-          metalness={0.9}
-          roughness={0.1}
-          opacity={0.3}
-          transparent
-        />
-      </mesh>
-
-      {/* Wheels */}
-      <Wheel position={[-0.8, 0.3, 1.2]} />
-      <Wheel position={[0.8, 0.3, 1.2]} />
-      <Wheel position={[-0.8, 0.3, -1.2]} />
-      <Wheel position={[0.8, 0.3, -1.2]} />
-
-      {/* Ground shadow plane */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -0.01, 0]}
-        receiveShadow
-      >
-        <planeGeometry args={[10, 10]} />
-        <shadowMaterial opacity={0.3} />
-      </mesh>
-    </group>
-  );
-}
-
-/**
- * Wheel component
- */
-function Wheel({ position }: { position: [number, number, number] }) {
-  return (
-    <group position={position}>
-      <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.3, 0.3, 0.2, 32]} />
-        <meshStandardMaterial color="#1f2937" metalness={0.2} roughness={0.8} />
-      </mesh>
-      {/* Wheel hub */}
-      <mesh rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.15, 0.15, 0.25, 32]} />
-        <meshStandardMaterial color="#6b7280" metalness={0.8} roughness={0.2} />
-      </mesh>
-    </group>
-  );
-}
+// GenericVehicle removed - now using RealisticVehicle component
 
 /**
  * 3D Damage Marker (for view mode)

@@ -34,6 +34,7 @@ import {
   getMarkerColor,
 } from "@/lib/3d/damage-markers";
 import { trackViewerOpened, trackMarkerAdded, trackMarkersSaved } from "@/lib/analytics/3d-viewer-analytics";
+import RealisticVehicle from "@/components/3d/models/RealisticVehicle";
 
 interface DamageAnnotatorProps {
   estimateId: string;
@@ -331,8 +332,8 @@ function SceneWithMarkers({
 
   return (
     <group onClick={handleClick}>
-      {/* Vehicle */}
-      <GenericVehicle ref={vehicleRef} />
+      {/* Realistic Vehicle */}
+      <RealisticVehicle ref={vehicleRef} vehicleType="sedan" />
 
       {/* Damage Markers */}
       {markers.map((marker) => (
@@ -387,33 +388,4 @@ function DamageMarkerMesh({
   );
 }
 
-/**
- * Generic vehicle (same as VehicleViewer but as forwardRef for raycasting)
- */
-import { forwardRef } from "react";
-
-const GenericVehicle = forwardRef<THREE.Group>((props, ref) => {
-  return (
-    <group ref={ref}>
-      {/* Car Body */}
-      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2, 0.8, 4]} />
-        <meshStandardMaterial color="#3b82f6" metalness={0.6} roughness={0.4} />
-      </mesh>
-
-      {/* Car Top */}
-      <mesh position={[0, 1.2, -0.3]} castShadow>
-        <boxGeometry args={[1.8, 0.6, 2]} />
-        <meshStandardMaterial color="#1e40af" metalness={0.5} roughness={0.5} />
-      </mesh>
-
-      {/* Ground plane */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <planeGeometry args={[10, 10]} />
-        <shadowMaterial opacity={0.3} />
-      </mesh>
-    </group>
-  );
-});
-
-GenericVehicle.displayName = "GenericVehicle";
+// GenericVehicle removed - now using RealisticVehicle component

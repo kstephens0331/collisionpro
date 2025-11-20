@@ -42,7 +42,9 @@
       "Bash(npx shadcn@latest add select)",
       "Bash(cat:*)",
       "Bash(node scripts/check-migrations.js:*)",
-      "Bash(node scripts/run-all-migrations.js:*)"
+      "Bash(node scripts/run-all-migrations.js:*)",
+      "Bash(del nul 2)",
+      "Bash(del nul)"
     ],
     "deny": [],
     "ask": []

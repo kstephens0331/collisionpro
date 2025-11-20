@@ -19,7 +19,7 @@ const RealisticVehicle = forwardRef<THREE.Group, RealisticVehicleProps>(
     const dimensions = useMemo(() => getDimensions(vehicleType), [vehicleType]);
 
     // Materials
-    const bodyMaterial = new THREE.MeshStandardMaterial({
+    const bodyMaterial = new THREE.MeshPhysicalMaterial({
       color: color,
       metalness: 0.8,
       roughness: 0.2,

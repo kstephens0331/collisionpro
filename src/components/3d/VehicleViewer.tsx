@@ -22,7 +22,7 @@ import { captureScreenshot, downloadScreenshot } from "@/lib/3d/screenshot-captu
 import { type DamageMarker, DAMAGE_TYPES } from "@/lib/3d/damage-markers";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
-import RealisticVehicle from "@/components/3d/models/RealisticVehicle";
+import ImprovedVehicle from "@/components/3d/models/ImprovedVehicle";
 
 interface VehicleViewerProps {
   vehicleType?: "sedan" | "suv" | "truck" | "coupe";
@@ -86,8 +86,8 @@ export default function VehicleViewer({
             {/* Scene Setup */}
             <SceneSetup selectedCamera={selectedCamera} />
 
-            {/* Realistic Vehicle Model */}
-            <RealisticVehicle vehicleType={vehicleType} />
+            {/* Improved Vehicle Model */}
+            <ImprovedVehicle vehicleType={vehicleType} />
 
             {/* Damage Markers (view mode) */}
             {mode === "view" && markers.map((marker) => (

@@ -34,7 +34,7 @@ import {
   getMarkerColor,
 } from "@/lib/3d/damage-markers";
 import { trackViewerOpened, trackMarkerAdded, trackMarkersSaved } from "@/lib/analytics/3d-viewer-analytics";
-import RealisticVehicle from "@/components/3d/models/RealisticVehicle";
+import ImprovedVehicle from "@/components/3d/models/ImprovedVehicle";
 
 interface DamageAnnotatorProps {
   estimateId: string;
@@ -332,8 +332,8 @@ function SceneWithMarkers({
 
   return (
     <group onClick={handleClick}>
-      {/* Realistic Vehicle */}
-      <RealisticVehicle ref={vehicleRef} vehicleType="sedan" />
+      {/* Improved Vehicle */}
+      <ImprovedVehicle ref={vehicleRef} vehicleType="sedan" />
 
       {/* Damage Markers */}
       {markers.map((marker) => (

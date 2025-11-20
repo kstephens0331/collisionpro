@@ -31,7 +31,18 @@
       "Bash(node scripts/add-labor-operations.js:*)",
       "Bash(move:*)",
       "Bash(del \"c:\\Users\\usmc3\\OneDrive\\Documents\\Stephens Code Programs\\collisionpro\\migrations\\phase-2\\2.9-email-delivery.sql\")",
-      "Bash(del \"c:\\Users\\usmc3\\OneDrive\\Documents\\Stephens Code Programs\\collisionpro\\migrations\\phase-2\\2.9-email-delivery-fixed.sql\")"
+      "Bash(del \"c:\\Users\\usmc3\\OneDrive\\Documents\\Stephens Code Programs\\collisionpro\\migrations\\phase-2\\2.9-email-delivery-fixed.sql\")",
+      "Bash(npx tsc:*)",
+      "Bash(del \"c:\\Users\\usmc3\\OneDrive\\Documents\\Stephens Code Programs\\collisionpro\\src\\middleware.ts\")",
+      "Bash(npm show:*)",
+      "Bash(node scripts/demo-rockauto-scraper.js:*)",
+      "Bash(psql:*)",
+      "Bash(node -e:*)",
+      "Bash(node scripts/run-phase6-migration.js:*)",
+      "Bash(npx shadcn@latest add select)",
+      "Bash(cat:*)",
+      "Bash(node scripts/check-migrations.js:*)",
+      "Bash(node scripts/run-all-migrations.js:*)"
     ],
     "deny": [],
     "ask": []

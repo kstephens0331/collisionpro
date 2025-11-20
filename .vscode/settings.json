@@ -1,4 +1,4 @@
 {
-    "claudeCode.selectedModel": "opus",
-    "claudeCode.respectGitIgnore": true
+    "claudeCode.respectGitIgnore": true,
+    "window.autoDetectColorScheme": true
 }

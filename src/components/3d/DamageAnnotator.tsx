@@ -190,15 +190,9 @@ export default function DamageAnnotator({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(SEVERITY_LEVELS).map(([key, { label, color }]) => (
+                  {Object.entries(SEVERITY_LEVELS).map(([key, { label }]) => (
                     <SelectItem key={key} value={key}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: color }}
-                        />
-                        {label}
-                      </div>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>

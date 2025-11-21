@@ -11,7 +11,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Settings, ShoppingCart, Brain } from "lucide-react";
+import {
+  User,
+  LogOut,
+  Settings,
+  ShoppingCart,
+  Brain,
+  Wrench,
+  Users,
+  ClipboardCheck,
+  DollarSign,
+  ChevronDown,
+} from "lucide-react";
 
 export default function DashboardNav() {
   const router = useRouter();
@@ -40,37 +51,90 @@ export default function DashboardNav() {
                 Dashboard
               </Link>
               <Link
-                href="/dashboard/parts"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
-              >
-                Parts Catalog
-              </Link>
-              <Link
                 href="/dashboard/estimates"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
               >
                 Estimates
               </Link>
               <Link
-                href="/dashboard/customers"
+                href="/dashboard/jobs"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
               >
-                Customers
+                <ClipboardCheck className="h-4 w-4 mr-1" />
+                Jobs
               </Link>
               <Link
-                href="/dashboard/cart"
+                href="/dashboard/parts"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
               >
-                <ShoppingCart className="h-4 w-4 mr-1" />
-                Cart
+                Parts
               </Link>
               <Link
-                href="/dashboard/ai-insights"
+                href="/dashboard/accounting"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
               >
-                <Brain className="h-4 w-4 mr-1" />
-                AI Insights
+                <DollarSign className="h-4 w-4 mr-1" />
+                Accounting
               </Link>
+
+              {/* Operations Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500">
+                    <Wrench className="h-4 w-4 mr-1" />
+                    Operations
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/dashboard/technicians"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Users className="h-4 w-4" />
+                      Technicians
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/dashboard/drp"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <ClipboardCheck className="h-4 w-4" />
+                      DRP Programs
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/dashboard/customers"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <User className="h-4 w-4" />
+                      Customers
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/dashboard/cart"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                      Cart
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/dashboard/ai-insights"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Brain className="h-4 w-4" />
+                      AI Insights
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 

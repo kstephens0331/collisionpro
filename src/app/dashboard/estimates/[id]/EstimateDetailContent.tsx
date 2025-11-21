@@ -72,6 +72,9 @@ interface Estimate {
   paintSubtotal: number;
   subtotal: number;
   taxAmount: number;
+  shopSupplies?: number;
+  environmentalFees?: number;
+  grandTotal?: number;
   total: number;
   createdAt: string;
 }
@@ -1061,15 +1064,31 @@ export default function EstimateDetailContent() {
                 ${estimate.taxAmount.toFixed(2)}
               </span>
             </div>
+            {estimate.shopSupplies && estimate.shopSupplies > 0 && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Shop Supplies</span>
+                <span className="font-medium">
+                  ${estimate.shopSupplies.toFixed(2)}
+                </span>
+              </div>
+            )}
+            {estimate.environmentalFees && estimate.environmentalFees > 0 && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Environmental Fees</span>
+                <span className="font-medium">
+                  ${estimate.environmentalFees.toFixed(2)}
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between text-lg font-bold pt-3 border-t">
               <span>Total</span>
-              <span>${estimate.total.toFixed(2)}</span>
+              <span>${(estimate.grandTotal || estimate.total).toFixed(2)}</span>
             </div>
             {estimate.deductible > 0 && (
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <span>Customer Responsibility (after deductible)</span>
                 <span className="font-medium">
-                  ${Math.max(0, estimate.total - estimate.deductible).toFixed(2)}
+                  ${Math.max(0, (estimate.grandTotal || estimate.total) - estimate.deductible).toFixed(2)}
                 </span>
               </div>
             )}

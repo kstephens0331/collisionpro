@@ -46,10 +46,16 @@ This document outlines all external API integrations needed for CollisionPro to 
 **Requirements**:
 - Commercial account required
 - B2B partnership program
-**Contact**:
-- AutoZone Commercial: 1-800-741-9179
+**Contact Options**:
+- **Business Development**: 1-800-AUTOZONE (288-6966) - Ask for commercial/B2B API team
+- **Alternative**: Fill out form at https://www.autozone.com/landing/page.jsp?name=commercial-credit-application
+- **Email**: commercialsales@autozone.com
+- **Local Store**: Visit your nearest AutoZone Commercial store and ask for district commercial manager
 - Website: https://www.autozone.com/commercial
-- API Documentation: Request from commercial rep
+- **Note**: AutoZone may not have a public API. Alternative approach:
+  - Request CSV/EDI integration for bulk ordering
+  - Ask about AutoZone Pro rewards integration
+  - Consider using their online ordering system manually
 
 ### 4. O'Reilly Auto Parts
 **Status**: ⏳ Planned

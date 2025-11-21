@@ -55,7 +55,8 @@
       "Bash(del /F /Q \"src\\components\\3d\\models\\ProfessionalVehicle.tsx\" \"src\\components\\3d\\models\\ImprovedVehicle.tsx\" \"src\\components\\3d\\models\\VehicleModel.tsx\" \"src\\components\\3d\\models\\RealisticVehicle.tsx\" \"src\\components\\3d\\models\\GLTFVehicle.tsx\")",
       "Bash(node scripts/run-tax-migration.js:*)",
       "Bash(node scripts/verify-tax-schema.js:*)",
-      "Bash(node scripts/create-shop-tax-settings.js:*)"
+      "Bash(node scripts/create-shop-tax-settings.js:*)",
+      "Bash(node scripts/run-paint-migration.js:*)"
     ],
     "deny": [],
     "ask": []

@@ -20,24 +20,6 @@ import {
   DollarSign,
   Box,
 } from "lucide-react";
-import { getVehicleType } from "@/lib/3d/vehicle-type-detector";
-import type { DamageMarker } from "@/lib/3d/damage-markers";
-
-// Lazy load 3D viewer for customer portal
-const VehicleViewer = dynamic(
-  () => import('@/components/3d/VehicleViewer'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-[600px] bg-gray-50 rounded-lg">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading 3D viewer...</p>
-        </div>
-      </div>
-    ),
-  }
-);
 
 interface TimelineEntry {
   id: string;
@@ -107,7 +89,6 @@ export default function EstimateDetailContent({
   const router = useRouter();
   const [statusData, setStatusData] = useState<EstimateStatus | null>(null);
   const [photos, setPhotos] = useState<GroupedPhotos>({ damage: [], progress: [], completed: [] });
-  const [damageMarkers, setDamageMarkers] = useState<DamageMarker[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [customerId, setCustomerId] = useState<string | null>(null);
@@ -126,7 +107,6 @@ export default function EstimateDetailContent({
       setCustomerId(customer.id);
       fetchStatus(customer.id);
       fetchPhotos(customer.id);
-      fetchDamageMarkers();
     } catch {
       router.push("/customer/login");
     }
@@ -164,18 +144,6 @@ export default function EstimateDetailContent({
       }
     } catch (err) {
       console.error("Error fetching photos:", err);
-    }
-  };
-
-  const fetchDamageMarkers = async () => {
-    try {
-      const response = await fetch(`/api/damage-annotations?estimateId=${id}`);
-      const data = await response.json();
-      if (data.success && data.data?.markers) {
-        setDamageMarkers(data.data.markers);
-      }
-    } catch (err) {
-      console.error("Error fetching damage markers:", err);
     }
   };
 
@@ -491,33 +459,6 @@ export default function EstimateDetailContent({
             )}
           </CardContent>
         </Card>
-
-        {/* 3D Damage Visualization */}
-        {damageMarkers.length > 0 && statusData.estimate.vehicleMake && statusData.estimate.vehicleModel && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Box className="h-5 w-5" />
-                3D Damage Visualization
-                <span className="ml-auto text-sm font-normal text-gray-500">
-                  {damageMarkers.length} {damageMarkers.length === 1 ? 'Marker' : 'Markers'}
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800">
-                  <strong>Interactive 3D View:</strong> Use your mouse to rotate, zoom, and pan around the vehicle to see damage locations.
-                </p>
-              </div>
-              <VehicleViewer
-                vehicleType={getVehicleType(statusData.estimate.vehicleMake, statusData.estimate.vehicleModel)}
-                mode="view"
-                estimateId={id}
-              />
-            </CardContent>
-          </Card>
-        )}
 
         {/* Photos Gallery */}
         {(photos.damage.length > 0 || photos.progress.length > 0 || photos.completed.length > 0) && (

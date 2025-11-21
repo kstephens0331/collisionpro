@@ -51,7 +51,8 @@
       "Bash(node scripts/check-tables-schema.js:*)",
       "Bash(node scripts/check-vehiclemodel-schema.js:*)",
       "Bash(if exist nul del /F nul 2)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(del /F /Q \"src\\components\\3d\\models\\ProfessionalVehicle.tsx\" \"src\\components\\3d\\models\\ImprovedVehicle.tsx\" \"src\\components\\3d\\models\\VehicleModel.tsx\" \"src\\components\\3d\\models\\RealisticVehicle.tsx\" \"src\\components\\3d\\models\\GLTFVehicle.tsx\")"
     ],
     "deny": [],
     "ask": []

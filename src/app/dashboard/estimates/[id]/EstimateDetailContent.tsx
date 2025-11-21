@@ -30,6 +30,7 @@ import {
 import LaborOperationSelector from "@/components/estimates/LaborOperationSelector";
 import PhotoUpload from "@/components/photos/PhotoUpload";
 import OrderPartsModal from "@/components/estimates/OrderPartsModal";
+import VehicleDiagram2D, { DamageMarker } from "@/components/diagrams/VehicleDiagram2D";
 import { LaborOperation, ShopSettings, calculateLaborCost } from "@/lib/labor-operations";
 
 interface Photo {
@@ -95,11 +96,13 @@ export default function EstimateDetailContent() {
   const [estimate, setEstimate] = useState<Estimate | null>(null);
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [damageMarkers, setDamageMarkers] = useState<DamageMarker[]>([]);
   const [shopSettings, setShopSettings] = useState<ShopSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [sending, setSending] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [savingDamageMarkers, setSavingDamageMarkers] = useState(false);
 
   // Modal states
   const [showLaborSelector, setShowLaborSelector] = useState(false);
@@ -142,6 +145,7 @@ export default function EstimateDetailContent() {
     fetchEstimate();
     fetchLineItems();
     fetchPhotos();
+    fetchDamageMarkers();
     fetchShopSettings();
   }, [estimateId]);
 
@@ -194,6 +198,47 @@ export default function EstimateDetailContent() {
       }
     } catch (error) {
       console.error("Error loading shop settings:", error);
+    }
+  };
+
+  const fetchDamageMarkers = async () => {
+    try {
+      const response = await fetch(`/api/damage-annotations?estimateId=${estimateId}`);
+      const data = await response.json();
+      if (data.success && data.data?.markers) {
+        setDamageMarkers(data.data.markers);
+      }
+    } catch (error) {
+      console.error("Error fetching damage markers:", error);
+    }
+  };
+
+  const handleSaveDamageMarkers = async (markers: DamageMarker[]) => {
+    setSavingDamageMarkers(true);
+    try {
+      const response = await fetch('/api/damage-annotations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          estimateId,
+          vehicleType: 'sedan', // Default to sedan for now
+          markers,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setDamageMarkers(markers);
+        alert('Damage annotations saved successfully!');
+      } else {
+        throw new Error(data.error || 'Failed to save damage annotations');
+      }
+    } catch (error: any) {
+      console.error("Error saving damage markers:", error);
+      alert(`Error saving damage annotations: ${error.message}`);
+    } finally {
+      setSavingDamageMarkers(false);
     }
   };
 
@@ -941,6 +986,38 @@ export default function EstimateDetailContent() {
         photos={photos}
         onPhotosChange={fetchPhotos}
       />
+
+      {/* 2D Damage Visualization */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Box className="h-5 w-5" />
+              Damage Diagram
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              {damageMarkers.length > 0 && (
+                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  {damageMarkers.length} {damageMarkers.length === 1 ? 'Marker' : 'Markers'}
+                </span>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <VehicleDiagram2D
+            estimateId={estimateId}
+            initialMarkers={damageMarkers}
+            onSave={handleSaveDamageMarkers}
+          />
+          {savingDamageMarkers && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-blue-600">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <span>Saving damage annotations...</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Totals */}
       <Card>

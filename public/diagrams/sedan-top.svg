@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" class="vehicle-diagram">
+  <defs>
+    <style>
+      .vehicle-outline { fill: #e5e7eb; stroke: #1f2937; stroke-width: 2; }
+      .vehicle-detail { fill: none; stroke: #4b5563; stroke-width: 1.5; }
+      .glass { fill: #bfdbfe; stroke: #1f2937; stroke-width: 1.5; }
+      .clickable-zone { fill: transparent; stroke: #3b82f6; stroke-width: 1; stroke-dasharray: 5,5; opacity: 0; cursor: pointer; }
+      .clickable-zone:hover { opacity: 0.3; fill: #3b82f6; }
+    </style>
+  </defs>
+
+  <!-- Main body -->
+  <rect class="vehicle-outline" x="80" y="100" width="240" height="400" rx="15"/>
+
+  <!-- Hood -->
+  <rect class="vehicle-detail" x="90" y="420" width="220" height="70" rx="10"/>
+
+  <!-- Windshield -->
+  <rect class="glass" x="100" y="350" width="200" height="60"/>
+
+  <!-- Roof -->
+  <rect class="vehicle-outline" x="90" y="200" width="220" height="140" rx="5"/>
+
+  <!-- Rear window -->
+  <rect class="glass" x="100" y="160" width="200" height="35"/>
+
+  <!-- Trunk -->
+  <rect class="vehicle-detail" x="90" y="110" width="220" height="45" rx="10"/>
+
+  <!-- Doors (outlines) -->
+  <line class="vehicle-detail" x1="80" y1="270" x2="320" y2="270"/>
+
+  <!-- Side mirrors -->
+  <ellipse class="vehicle-detail" cx="70" cy="380" rx="15" ry="8" fill="#4b5563"/>
+  <ellipse class="vehicle-detail" cx="330" cy="380" rx="15" ry="8" fill="#4b5563"/>
+
+  <!-- Wheels -->
+  <rect class="vehicle-outline" x="50" y="440" width="40" height="50" rx="8"/>
+  <rect class="vehicle-outline" x="310" y="440" width="40" height="50" rx="8"/>
+  <rect class="vehicle-outline" x="50" y="160" width="40" height="50" rx="8"/>
+  <rect class="vehicle-outline" x="310" y="160" width="40" height="50" rx="8"/>
+
+  <!-- Clickable zones -->
+  <rect class="clickable-zone" data-part="hood" x="90" y="410" width="220" height="80"/>
+  <rect class="clickable-zone" data-part="windshield" x="100" y="350" width="200" height="60"/>
+  <rect class="clickable-zone" data-part="roof" x="90" y="200" width="220" height="140"/>
+  <rect class="clickable-zone" data-part="rear-window" x="100" y="160" width="200" height="35"/>
+  <rect class="clickable-zone" data-part="trunk" x="90" y="105" width="220" height="50"/>
+
+  <!-- Door zones -->
+  <rect class="clickable-zone" data-part="driver-front-door" x="80" y="270" width="120" height="80"/>
+  <rect class="clickable-zone" data-part="driver-rear-door" x="80" y="190" width="120" height="80"/>
+  <rect class="clickable-zone" data-part="passenger-front-door" x="200" y="270" width="120" height="80"/>
+  <rect class="clickable-zone" data-part="passenger-rear-door" x="200" y="190" width="120" height="80"/>
+
+  <!-- Fender zones -->
+  <rect class="clickable-zone" data-part="driver-front-fender" x="80" y="390" width="120" height="100"/>
+  <rect class="clickable-zone" data-part="driver-rear-fender" x="80" y="110" width="120" height="80"/>
+  <rect class="clickable-zone" data-part="passenger-front-fender" x="200" y="390" width="120" height="100"/>
+  <rect class="clickable-zone" data-part="passenger-rear-fender" x="200" y="110" width="120" height="80"/>
+
+  <!-- Mirror zones -->
+  <ellipse class="clickable-zone" data-part="driver-mirror" cx="70" cy="380" rx="20" ry="15"/>
+  <ellipse class="clickable-zone" data-part="passenger-mirror" cx="330" cy="380" rx="20" ry="15"/>
+
+  <!-- Wheel zones -->
+  <rect class="clickable-zone" data-part="driver-front-wheel" x="45" y="435" width="50" height="60"/>
+  <rect class="clickable-zone" data-part="driver-rear-wheel" x="45" y="155" width="50" height="60"/>
+  <rect class="clickable-zone" data-part="passenger-front-wheel" x="305" y="435" width="50" height="60"/>
+  <rect class="clickable-zone" data-part="passenger-rear-wheel" x="305" y="155" width="50" height="60"/>
+</svg>

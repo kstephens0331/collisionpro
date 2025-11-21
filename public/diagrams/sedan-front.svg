@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" class="vehicle-diagram">
+  <!-- Front view of sedan -->
+  <defs>
+    <style>
+      .vehicle-outline { fill: #e5e7eb; stroke: #1f2937; stroke-width: 2; }
+      .vehicle-detail { fill: none; stroke: #4b5563; stroke-width: 1.5; }
+      .clickable-zone { fill: transparent; stroke: #3b82f6; stroke-width: 1; stroke-dasharray: 5,5; opacity: 0; cursor: pointer; }
+      .clickable-zone:hover { opacity: 0.3; fill: #3b82f6; }
+    </style>
+  </defs>
+
+  <!-- Main body -->
+  <rect class="vehicle-outline" x="80" y="100" width="240" height="120" rx="10"/>
+
+  <!-- Roof -->
+  <path class="vehicle-outline" d="M 120 100 L 120 60 L 280 60 L 280 100" />
+
+  <!-- Windshield -->
+  <path class="vehicle-detail" d="M 130 100 L 135 70 L 265 70 L 270 100" />
+
+  <!-- Hood -->
+  <rect class="vehicle-detail" x="100" y="220" width="200" height="30" rx="5"/>
+
+  <!-- Headlights -->
+  <ellipse class="vehicle-detail" cx="140" cy="235" rx="20" ry="10" fill="#fff9c4"/>
+  <ellipse class="vehicle-detail" cx="260" cy="235" rx="20" ry="10" fill="#fff9c4"/>
+
+  <!-- Grille -->
+  <rect class="vehicle-detail" x="170" y="220" width="60" height="25" rx="3" fill="#212121"/>
+
+  <!-- Wheels -->
+  <circle class="vehicle-outline" cx="120" cy="250" r="30"/>
+  <circle class="vehicle-detail" cx="120" cy="250" r="15" fill="#212121"/>
+
+  <circle class="vehicle-outline" cx="280" cy="250" r="30"/>
+  <circle class="vehicle-detail" cx="280" cy="250" r="15" fill="#212121"/>
+
+  <!-- Clickable zones for damage marking -->
+  <rect class="clickable-zone" data-part="hood" x="100" y="210" width="200" height="40"/>
+  <rect class="clickable-zone" data-part="front-bumper" x="80" y="240" width="240" height="40"/>
+  <rect class="clickable-zone" data-part="windshield" x="130" y="70" width="140" height="30"/>
+  <rect class="clickable-zone" data-part="roof" x="120" y="60" width="160" height="40"/>
+  <rect class="clickable-zone" data-part="hood-center" x="150" y="200" width="100" height="20"/>
+  <rect class="clickable-zone" data-part="left-headlight" x="120" y="225" width="40" height="20"/>
+  <rect class="clickable-zone" data-part="right-headlight" x="240" y="225" width="40" height="20"/>
+  <rect class="clickable-zone" data-part="grille" x="170" y="220" width="60" height="25"/>
+  <circle class="clickable-zone" data-part="left-wheel" cx="120" cy="250" r="30"/>
+  <circle class="clickable-zone" data-part="right-wheel" cx="280" cy="250" r="30"/>
+  <rect class="clickable-zone" data-part="left-fender" x="80" y="180" width="60" height="60"/>
+  <rect class="clickable-zone" data-part="right-fender" x="260" y="180" width="60" height="60"/>
+</svg>

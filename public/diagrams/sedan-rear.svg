@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" class="vehicle-diagram">
+  <defs>
+    <style>
+      .vehicle-outline { fill: #e5e7eb; stroke: #1f2937; stroke-width: 2; }
+      .vehicle-detail { fill: none; stroke: #4b5563; stroke-width: 1.5; }
+      .clickable-zone { fill: transparent; stroke: #3b82f6; stroke-width: 1; stroke-dasharray: 5,5; opacity: 0; cursor: pointer; }
+      .clickable-zone:hover { opacity: 0.3; fill: #3b82f6; }
+    </style>
+  </defs>
+
+  <!-- Main body -->
+  <rect class="vehicle-outline" x="80" y="100" width="240" height="120" rx="10"/>
+
+  <!-- Roof -->
+  <path class="vehicle-outline" d="M 120 100 L 120 60 L 280 60 L 280 100" />
+
+  <!-- Rear window -->
+  <path class="vehicle-detail" d="M 130 100 L 140 75 L 260 75 L 270 100" fill="#bfdbfe"/>
+
+  <!-- Trunk -->
+  <rect class="vehicle-detail" x="100" y="220" width="200" height="30" rx="5"/>
+
+  <!-- Taillights -->
+  <ellipse class="vehicle-detail" cx="140" cy="235" rx="20" ry="10" fill="#ffcdd2"/>
+  <ellipse class="vehicle-detail" cx="260" cy="235" rx="20" ry="10" fill="#ffcdd2"/>
+
+  <!-- License plate area -->
+  <rect class="vehicle-detail" x="170" y="225" width="60" height="20" rx="2" fill="#fff"/>
+
+  <!-- Bumper detail -->
+  <line class="vehicle-detail" x1="90" y1="240" x2="310" y2="240"/>
+
+  <!-- Wheels -->
+  <circle class="vehicle-outline" cx="120" cy="250" r="30"/>
+  <circle class="vehicle-detail" cx="120" cy="250" r="15" fill="#212121"/>
+
+  <circle class="vehicle-outline" cx="280" cy="250" r="30"/>
+  <circle class="vehicle-detail" cx="280" cy="250" r="15" fill="#212121"/>
+
+  <!-- Clickable zones -->
+  <rect class="clickable-zone" data-part="trunk" x="100" y="210" width="200" height="40"/>
+  <rect class="clickable-zone" data-part="rear-bumper" x="80" y="240" width="240" height="40"/>
+  <rect class="clickable-zone" data-part="rear-window" x="130" y="75" width="140" height="25"/>
+  <rect class="clickable-zone" data-part="roof" x="120" y="60" width="160" height="40"/>
+  <rect class="clickable-zone" data-part="left-taillight" x="120" y="225" width="40" height="20"/>
+  <rect class="clickable-zone" data-part="right-taillight" x="240" y="225" width="40" height="20"/>
+  <rect class="clickable-zone" data-part="license-plate" x="170" y="225" width="60" height="20"/>
+  <circle class="clickable-zone" data-part="left-wheel" cx="120" cy="250" r="30"/>
+  <circle class="clickable-zone" data-part="right-wheel" cx="280" cy="250" r="30"/>
+  <rect class="clickable-zone" data-part="left-quarter-panel" x="80" y="180" width="60" height="60"/>
+  <rect class="clickable-zone" data-part="right-quarter-panel" x="260" y="180" width="60" height="60"/>
+</svg>

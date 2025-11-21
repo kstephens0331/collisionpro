@@ -11,7 +11,7 @@ import { X, Plus, Save } from "lucide-react";
 export interface DamageMarker {
   id: string;
   part: string;
-  view: "front" | "side" | "top" | "rear";
+  view: "front" | "left" | "right" | "top" | "rear";
   damageType: string;
   severity: string;
   description: string;
@@ -27,10 +27,11 @@ interface VehicleDiagram2DProps {
 }
 
 const VIEWS = [
-  { id: "front", label: "Front View", diagram: "/diagrams/sedan-front.svg" },
-  { id: "side", label: "Side View", diagram: "/diagrams/sedan-side.svg" },
-  { id: "top", label: "Top View", diagram: "/diagrams/sedan-top.svg" },
-  { id: "rear", label: "Rear View", diagram: "/diagrams/sedan-rear.svg" },
+  { id: "front", label: "Front", diagram: "/diagrams/sedan-front.svg" },
+  { id: "left", label: "Left Side", diagram: "/diagrams/sedan-left.svg" },
+  { id: "right", label: "Right Side", diagram: "/diagrams/sedan-right.svg" },
+  { id: "top", label: "Top", diagram: "/diagrams/sedan-top.svg" },
+  { id: "rear", label: "Rear", diagram: "/diagrams/sedan-rear.svg" },
 ] as const;
 
 const DAMAGE_TYPES = {
@@ -53,7 +54,7 @@ export default function VehicleDiagram2D({
   initialMarkers = [],
   onSave,
 }: VehicleDiagram2DProps) {
-  const [currentView, setCurrentView] = useState<"front" | "side" | "top" | "rear">("front");
+  const [currentView, setCurrentView] = useState<"front" | "left" | "right" | "top" | "rear">("front");
   const [markers, setMarkers] = useState<DamageMarker[]>(initialMarkers);
   const [addMode, setAddMode] = useState(false);
   const [newDamageType, setNewDamageType] = useState<string>("dent");

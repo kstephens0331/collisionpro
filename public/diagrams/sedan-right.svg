@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 350" class="vehicle-diagram">
+  <defs>
+    <style>
+      .vehicle-outline { fill: #cbd5e1; stroke: #1e293b; stroke-width: 3; }
+      .vehicle-detail { fill: none; stroke: #475569; stroke-width: 2; }
+      .window { fill: #bfdbfe; stroke: #1e293b; stroke-width: 2; opacity: 0.7; }
+      .clickable-zone { fill: transparent; stroke: #3b82f6; stroke-width: 2; stroke-dasharray: 5,5; opacity: 0; cursor: pointer; transition: all 0.2s; }
+      .clickable-zone:hover { opacity: 0.4; fill: #3b82f6; }
+      .view-label { fill: #ef4444; font-family: Arial, sans-serif; font-size: 28px; font-weight: bold; text-anchor: middle; }
+      .direction-label { fill: #0ea5e9; font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; }
+    </style>
+  </defs>
+
+  <!-- View Label -->
+  <text class="view-label" x="350" y="35">RIGHT SIDE VIEW</text>
+
+  <!-- Direction indicators (flipped from left) -->
+  <text class="direction-label" x="80" y="180">← FRONT</text>
+  <text class="direction-label" x="600" y="180">REAR →</text>
+
+  <!-- Main body profile (mirrored from left) -->
+  <path class="vehicle-outline" d="M 550 200 L 550 160 L 500 140 L 440 130 L 380 130 L 320 130 L 260 135 L 200 140 L 140 150 L 100 160 L 100 200 Z"/>
+
+  <!-- Roof line -->
+  <path class="vehicle-outline" d="M 440 130 L 420 100 L 220 100 L 180 130"/>
+
+  <!-- Windows -->
+  <path class="window" d="M 415 105 L 415 130 L 350 130 L 350 105 Z"/>
+  <path class="window" d="M 345 105 L 345 130 L 280 130 L 280 105 Z"/>
+  <path class="window" d="M 275 105 L 275 130 L 210 130 L 185 105 Z"/>
+
+  <!-- Windshield -->
+  <path class="window" d="M 180 105 L 180 130 L 140 140 L 140 120 Z"/>
+
+  <!-- Rear window -->
+  <path class="window" d="M 440 105 L 440 130 L 480 140 L 480 120 Z"/>
+
+  <!-- Doors -->
+  <line class="vehicle-detail" x1="350" y1="130" x2="350" y2="200"/>
+  <line class="vehicle-detail" x1="280" y1="130" x2="280" y2="200"/>
+
+  <!-- Door handles -->
+  <rect class="vehicle-detail" x="400" y="160" width="20" height="6" rx="3"/>
+  <rect class="vehicle-detail" x="300" y="160" width="20" height="6" rx="3"/>
+  <rect class="vehicle-detail" x="200" y="160" width="20" height="6" rx="3"/>
+
+  <!-- Side mirror -->
+  <ellipse class="vehicle-detail" cx="175" cy="120" rx="10" ry="15" fill="#475569"/>
+
+  <!-- Wheels -->
+  <circle class="vehicle-outline" cx="460" cy="220" r="45"/>
+  <circle class="vehicle-detail" cx="460" cy="220" r="22" fill="#1e293b"/>
+
+  <circle class="vehicle-outline" cx="160" cy="220" r="45"/>
+  <circle class="vehicle-detail" cx="160" cy="220" r="22" fill="#1e293b"/>
+
+  <!-- Headlight -->
+  <ellipse class="vehicle-detail" cx="110" cy="170" rx="15" ry="25" fill="#fff9c4"/>
+
+  <!-- Taillight -->
+  <ellipse class="vehicle-detail" cx="540" cy="170" rx="10" ry="22" fill="#ffcdd2"/>
+
+  <!-- Rocker panel -->
+  <line class="vehicle-detail" x1="140" y1="205" x2="500" y2="205"/>
+
+  <!-- Clickable zones -->
+  <rect class="clickable-zone" data-part="right-front-bumper" x="95" y="140" width="45" height="70"/>
+  <rect class="clickable-zone" data-part="right-front-fender" x="140" y="135" width="80" height="75"/>
+  <rect class="clickable-zone" data-part="right-front-door" x="210" y="105" width="70" height="95"/>
+  <rect class="clickable-zone" data-part="right-rear-door" x="280" y="105" width="135" height="95"/>
+  <rect class="clickable-zone" data-part="right-rear-fender" x="415" y="140" width="135" height="70"/>
+  <rect class="clickable-zone" data-part="right-rear-bumper" x="530" y="150" width="30" height="60"/>
+  <path class="clickable-zone" data-part="right-hood" d="M 260 135 L 140 150 L 140 200 L 260 200 Z"/>
+  <path class="clickable-zone" data-part="right-trunk" d="M 550 160 L 500 140 L 500 200 L 550 200 Z"/>
+  <path class="clickable-zone" data-part="right-roof" d="M 420 100 L 220 100 L 180 130 L 440 130 Z"/>
+  <path class="clickable-zone" data-part="right-windshield" d="M 185 105 L 180 130 L 140 140 L 140 120 Z"/>
+  <path class="clickable-zone" data-part="right-rear-window" d="M 440 105 L 440 130 L 480 140 L 480 120 Z"/>
+  <circle class="clickable-zone" data-part="right-front-wheel" cx="160" cy="220" r="45"/>
+  <circle class="clickable-zone" data-part="right-rear-wheel" cx="460" cy="220" r="45"/>
+  <ellipse class="clickable-zone" data-part="right-mirror" cx="175" cy="120" rx="18" ry="25"/>
+  <rect class="clickable-zone" data-part="right-rocker-panel" x="140" y="200" width="360" height="15"/>
+</svg>

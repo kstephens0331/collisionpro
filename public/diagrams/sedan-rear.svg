@@ -1,52 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" class="vehicle-diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" class="vehicle-diagram">
   <defs>
     <style>
-      .vehicle-outline { fill: #e5e7eb; stroke: #1f2937; stroke-width: 2; }
-      .vehicle-detail { fill: none; stroke: #4b5563; stroke-width: 1.5; }
-      .clickable-zone { fill: transparent; stroke: #3b82f6; stroke-width: 1; stroke-dasharray: 5,5; opacity: 0; cursor: pointer; }
-      .clickable-zone:hover { opacity: 0.3; fill: #3b82f6; }
+      .vehicle-outline { fill: #cbd5e1; stroke: #1e293b; stroke-width: 3; }
+      .vehicle-detail { fill: none; stroke: #475569; stroke-width: 2; }
+      .glass { fill: #bfdbfe; stroke: #1e293b; stroke-width: 2; opacity: 0.7; }
+      .taillight { fill: #ffcdd2; stroke: #c62828; stroke-width: 2; }
+      .clickable-zone { fill: transparent; stroke: #3b82f6; stroke-width: 2; stroke-dasharray: 5,5; opacity: 0; cursor: pointer; transition: all 0.2s; }
+      .clickable-zone:hover { opacity: 0.4; fill: #3b82f6; }
+      .label { fill: #1e293b; font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; }
+      .view-label { fill: #ef4444; font-family: Arial, sans-serif; font-size: 28px; font-weight: bold; text-anchor: middle; }
+      .side-label { fill: #0ea5e9; font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; }
     </style>
   </defs>
 
+  <!-- View Label -->
+  <text class="view-label" x="250" y="35">REAR VIEW</text>
+
   <!-- Main body -->
-  <rect class="vehicle-outline" x="80" y="100" width="240" height="120" rx="10"/>
+  <rect class="vehicle-outline" x="100" y="120" width="300" height="160" rx="15"/>
 
   <!-- Roof -->
-  <path class="vehicle-outline" d="M 120 100 L 120 60 L 280 60 L 280 100" />
+  <path class="vehicle-outline" d="M 150 120 L 150 90 L 350 90 L 350 120" />
 
   <!-- Rear window -->
-  <path class="vehicle-detail" d="M 130 100 L 140 75 L 260 75 L 270 100" fill="#bfdbfe"/>
+  <path class="glass" d="M 165 120 L 170 100 L 330 100 L 335 120 Z"/>
 
   <!-- Trunk -->
-  <rect class="vehicle-detail" x="100" y="220" width="200" height="30" rx="5"/>
-
-  <!-- Taillights -->
-  <ellipse class="vehicle-detail" cx="140" cy="235" rx="20" ry="10" fill="#ffcdd2"/>
-  <ellipse class="vehicle-detail" cx="260" cy="235" rx="20" ry="10" fill="#ffcdd2"/>
+  <rect class="vehicle-detail" x="120" y="250" width="260" height="40" rx="8"/>
+  <line class="vehicle-detail" x1="250" y1="250" x2="250" y2="290"/>
 
   <!-- License plate area -->
-  <rect class="vehicle-detail" x="170" y="225" width="60" height="20" rx="2" fill="#fff"/>
+  <rect class="vehicle-detail" x="210" y="265" width="80" height="25" rx="3" fill="#fff"/>
+  <line class="vehicle-detail" x1="220" y1="270" x2="280" y2="270"/>
+  <line class="vehicle-detail" x1="220" y1="275" x2="280" y2="275"/>
+  <line class="vehicle-detail" x1="220" y1="280" x2="280" y2="280"/>
 
-  <!-- Bumper detail -->
-  <line class="vehicle-detail" x1="90" y1="240" x2="310" y2="240"/>
+  <!-- Taillights -->
+  <ellipse class="taillight" cx="150" cy="265" rx="25" ry="15"/>
+  <ellipse class="taillight" cx="350" cy="265" rx="25" ry="15"/>
+
+  <!-- Rear bumper -->
+  <rect class="vehicle-outline" x="80" y="295" width="340" height="35" rx="10"/>
+  <line class="vehicle-detail" x1="100" y1="310" x2="400" y2="310"/>
+
+  <!-- Bumper detail lines -->
+  <line class="vehicle-detail" x1="100" y1="315" x2="400" y2="315"/>
 
   <!-- Wheels -->
-  <circle class="vehicle-outline" cx="120" cy="250" r="30"/>
-  <circle class="vehicle-detail" cx="120" cy="250" r="15" fill="#212121"/>
+  <circle class="vehicle-outline" cx="140" cy="310" r="40"/>
+  <circle class="vehicle-detail" cx="140" cy="310" r="20" fill="#1e293b"/>
 
-  <circle class="vehicle-outline" cx="280" cy="250" r="30"/>
-  <circle class="vehicle-detail" cx="280" cy="250" r="15" fill="#212121"/>
+  <circle class="vehicle-outline" cx="360" cy="310" r="40"/>
+  <circle class="vehicle-detail" cx="360" cy="310" r="20" fill="#1e293b"/>
+
+  <!-- Side mirrors -->
+  <ellipse class="vehicle-detail" cx="70" cy="180" rx="12" ry="18" fill="#475569"/>
+  <ellipse class="vehicle-detail" cx="430" cy="180" rx="12" ry="18" fill="#475569"/>
+
+  <!-- Side Labels -->
+  <text class="side-label" x="25" y="200">LEFT</text>
+  <text class="side-label" x="442" y="200">RIGHT</text>
 
   <!-- Clickable zones -->
-  <rect class="clickable-zone" data-part="trunk" x="100" y="210" width="200" height="40"/>
-  <rect class="clickable-zone" data-part="rear-bumper" x="80" y="240" width="240" height="40"/>
-  <rect class="clickable-zone" data-part="rear-window" x="130" y="75" width="140" height="25"/>
-  <rect class="clickable-zone" data-part="roof" x="120" y="60" width="160" height="40"/>
-  <rect class="clickable-zone" data-part="left-taillight" x="120" y="225" width="40" height="20"/>
-  <rect class="clickable-zone" data-part="right-taillight" x="240" y="225" width="40" height="20"/>
-  <rect class="clickable-zone" data-part="license-plate" x="170" y="225" width="60" height="20"/>
-  <circle class="clickable-zone" data-part="left-wheel" cx="120" cy="250" r="30"/>
-  <circle class="clickable-zone" data-part="right-wheel" cx="280" cy="250" r="30"/>
-  <rect class="clickable-zone" data-part="left-quarter-panel" x="80" y="180" width="60" height="60"/>
-  <rect class="clickable-zone" data-part="right-quarter-panel" x="260" y="180" width="60" height="60"/>
+  <rect class="clickable-zone" data-part="trunk" x="120" y="240" width="260" height="50"/>
+  <rect class="clickable-zone" data-part="rear-bumper" x="80" y="295" width="340" height="35"/>
+  <rect class="clickable-zone" data-part="rear-window" x="165" y="100" width="170" height="25"/>
+  <rect class="clickable-zone" data-part="license-plate" x="210" y="265" width="80" height="25"/>
+  <ellipse class="clickable-zone" data-part="left-taillight" cx="150" cy="265" rx="30" ry="20"/>
+  <ellipse class="clickable-zone" data-part="right-taillight" cx="350" cy="265" rx="30" ry="20"/>
+  <circle class="clickable-zone" data-part="left-wheel" cx="140" cy="310" r="40"/>
+  <circle class="clickable-zone" data-part="right-wheel" cx="360" cy="310" r="40"/>
+  <rect class="clickable-zone" data-part="left-quarter-panel" x="100" y="180" width="80" height="70"/>
+  <rect class="clickable-zone" data-part="right-quarter-panel" x="320" y="180" width="80" height="70"/>
+  <ellipse class="clickable-zone" data-part="left-mirror" cx="70" cy="180" rx="20" ry="25"/>
+  <ellipse class="clickable-zone" data-part="right-mirror" cx="430" cy="180" rx="20" ry="25"/>
 </svg>

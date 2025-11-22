@@ -5,8 +5,10 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import AIChatInterface from '@/components/ai/AIChatInterface';
-import { Sparkles, MessageSquare, Clock } from 'lucide-react';
+import EnhancedAIChatInterface from '@/components/ai/EnhancedAIChatInterface';
+import ConversationList from '@/components/ai/ConversationList';
+import AIUsageStats from '@/components/ai/AIUsageStats';
+import { Sparkles } from 'lucide-react';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -38,7 +40,7 @@ export default async function AIAssistantPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-8 text-white">
+      <div className="bg-linear-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-8 text-white">
         <div className="flex items-center gap-3 mb-4">
           <Sparkles className="h-8 w-8" />
           <h1 className="text-3xl font-bold">AI Assistant</h1>
@@ -46,67 +48,18 @@ export default async function AIAssistantPage() {
         <p className="text-blue-100 text-lg">
           Powered by Claude 3.5 Sonnet - Your intelligent shop management companion
         </p>
-
-        {/* Quick Stats */}
-        {todayUsage && (
-          <div className="mt-6 grid grid-cols-3 gap-4">
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-              <div className="text-blue-100 text-sm">Messages Today</div>
-              <div className="text-2xl font-bold">{todayUsage.messagesCount}</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-              <div className="text-blue-100 text-sm">Actions Executed</div>
-              <div className="text-2xl font-bold">{todayUsage.actionsExecuted}</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-              <div className="text-blue-100 text-sm">Cost Today</div>
-              <div className="text-2xl font-bold">
-                ${(todayUsage.totalCost || 0).toFixed(4)}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Recent Conversations Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Recent Conversations
-            </h2>
+      {/* Usage Stats */}
+      <AIUsageStats stats={todayUsage} period="today" />
 
-            {conversations && conversations.length > 0 ? (
-              <div className="space-y-2">
-                {conversations.map((conv) => (
-                  <a
-                    key={conv.id}
-                    href={`/dashboard/ai-assistant?conversation=${conv.id}`}
-                    className="block p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <div className="font-medium text-sm text-gray-900 truncate">
-                      {conv.title || 'Untitled Conversation'}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {conv.messageCount} messages
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {new Date(conv.updatedAt).toLocaleDateString()}
-                    </div>
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No conversations yet</p>
-              </div>
-            )}
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar */}
+        <div className="lg:col-span-1 space-y-4">
+          <ConversationList userId={userId} />
 
           {/* Capabilities */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mt-4">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 className="font-semibold text-gray-900 mb-3">I can help with:</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start gap-2">
@@ -142,8 +95,8 @@ export default async function AIAssistantPage() {
         </div>
 
         {/* Chat Interface */}
-        <div className="lg:col-span-3" style={{ height: 'calc(100vh - 250px)' }}>
-          <AIChatInterface />
+        <div className="lg:col-span-3" style={{ height: 'calc(100vh - 350px)' }}>
+          <EnhancedAIChatInterface enableStreaming={true} />
         </div>
       </div>
 
@@ -179,7 +132,7 @@ export default async function AIAssistantPage() {
           ].map((example, idx) => (
             <div
               key={idx}
-              className="bg-gradient-to-br from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-100"
+              className="bg-linear-to-br from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-100"
             >
               <div className="font-medium text-gray-900 mb-1">{example.title}</div>
               <div className="text-sm text-gray-600 italic">"{example.prompt}"</div>

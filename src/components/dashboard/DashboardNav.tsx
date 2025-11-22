@@ -22,6 +22,7 @@ import {
   ClipboardCheck,
   DollarSign,
   ChevronDown,
+  Sparkles,
 } from "lucide-react";
 
 export default function DashboardNav() {
@@ -75,6 +76,13 @@ export default function DashboardNav() {
               >
                 <DollarSign className="h-4 w-4 mr-1" />
                 Accounting
+              </Link>
+              <Link
+                href="/dashboard/ai-assistant"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-blue-500"
+              >
+                <Sparkles className="h-4 w-4 mr-1" />
+                AI Assistant
               </Link>
 
               {/* Operations Dropdown */}

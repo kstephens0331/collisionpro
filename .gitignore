@@ -15,3 +15,10 @@ nul
 
 .claude/
 CLAUDE.md
+
+# Environment files should never be committed
+.env
+.env.local
+.env.production
+.env.vercel
+.env.SETUP_GUIDE.md
